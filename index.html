@@ -36,8 +36,17 @@
 #p1 .project-header .meta{font-size:10.5px;line-height:1.8;margin-top:9px;gap:3px 16px;color:#666}
 #p1 .project-header .scope-status{color:#777}
 @media(max-width:760px){#p1 .project-header{padding-top:18px}#p1 .project-header h1{font-size:23px;margin-bottom:13px}#p1 .project-identity .project-name{font-size:17px}#p1 .project-header .meta{gap:3px 12px}}
+
+/* Match the concise opening hierarchy on the first-month schedule page. */
+#p2 .month-header{padding-top:22px}
+#p2 .month-header .eyebrow{font-size:10px;letter-spacing:1.5px;line-height:1.6;margin:0 0 7px}
+#p2 .month-header h2{font-size:26px;font-weight:650;line-height:1.45;letter-spacing:0;margin:0 0 9px}
+#p2 .month-header .lead{font-size:12px;line-height:1.8;margin:0;color:#666}
+#p2 .timeline{margin-top:16px}
+#p2 .month-header+.business-focus{margin-top:13px;margin-bottom:12px}
+@media(max-width:760px){#p2 .month-header{padding-top:18px}#p2 .month-header h2{font-size:23px}#p2 .month-header .lead{font-size:12px}}
 </style>
-<link rel="stylesheet" href="assets/workspace.css?v=20261103-hero">
+<link rel="stylesheet" href="assets/workspace.css?v=20261103-month-header">
 </head>
 <body class="view-details">
 <header class="app-topbar" data-app-ui><a class="app-brand" href="#" id="home-link"><span class="brand-mark" aria-hidden="true">壹</span><span>GEO 方案工作台</span></a><span class="privacy-badge">报告仅存本机</span></header>
@@ -97,7 +106,7 @@
 </section>
 <section class="page" id="p2">
 <div class="masthead"><span class="brand" data-bind="provider"></span><span>执行排期</span></div>
-<div class="eyebrow">02 / 首月启动排期</div><h2>什么时候做什么，<br>每个阶段交付什么</h2><p class="lead">首月建立业务资料、内容与监测起点，后续按月持续执行，并结合阶段复盘调整。</p>
+<div class="month-header"><div class="eyebrow">02 / 首月启动排期</div><h2>首月工作安排与阶段交付</h2><p class="lead">按周明确工作、交付及客户配合，具体排期在启动时确认。</p></div>
 <div class="business-focus" data-focus-block hidden><strong>本次优先解决的问题</strong><span data-focus="concern"></span></div>
 <div class="timeline">
 <div class="stage"><div class="week">第1周<small>了解与诊断</small></div><div><h3>了解业务，记录现状</h3><p data-edit="w1"><span class="label">工作</span>收集企业、产品与服务资料，确认主推业务、目标客户、区域及目标 AI 平台；拟定初始问题并记录相关 AI 回答。</p><p data-edit="d1"><span class="label">交付</span>资料清单、初始诊断结果、推广重点建议。</p><p class="output" data-edit="c1">贵司配合：指定对接人，提供现有资料，确认业务重点。</p></div></div>
@@ -172,7 +181,7 @@
 <dialog id="new-dialog" data-app-ui aria-labelledby="new-dialog-title"><form method="dialog"><div class="dialog-head"><h2 id="new-dialog-title">新建客户方案</h2><button aria-label="关闭">关闭</button></div><label>客户 / 方案名称<input id="new-name" maxlength="120" placeholder="填写本次服务的客户名称"></label><input id="new-template" type="hidden" value="generic"><p class="small">从通用模板开始，独立保存本次方案。也可以从“更多操作”复制已有方案。</p><button type="button" id="create-plan" class="primary">创建并填写资料</button></form></dialog>
 <dialog id="history-dialog" data-app-ui aria-labelledby="history-dialog-title"><div class="dialog-head"><h2 id="history-dialog-title">历史版本</h2><button id="close-history">关闭</button></div><p class="small">当前稿会自动保存。可通过“更多操作 → 保存一个版本”留存节点，最多保留最近30个版本。</p><div id="history-list"></div><section id="version-preview" hidden><h3 id="version-title"></h3><p id="version-summary"></p><button id="restore-version" class="primary">恢复这个版本</button></section></dialog>
 <script type="application/json" id="saved-state">{}</script>
-<script src="assets/report.js?v=20261103-hero"></script>
-<script src="assets/workspace.js?v=20261103-hero"></script>
-<script src="assets/interface.js?v=20261103-hero"></script>
+<script src="assets/report.js?v=20261103-month-header"></script>
+<script src="assets/workspace.js?v=20261103-month-header"></script>
+<script src="assets/interface.js?v=20261103-month-header"></script>
 </body></html>
