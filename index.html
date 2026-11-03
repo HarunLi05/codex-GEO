@@ -25,8 +25,19 @@
 .annual-business-focuses{display:grid;grid-template-columns:1fr 1fr;gap:10px}.annual-business-focuses .business-focus{display:block;margin:7px 0;padding:7px 9px}.annual-business-focuses strong{display:block;margin-bottom:4px}#p5 .monitoring-focus{padding:4px 10px;margin:4px 0}#p6 .eyebrow{margin-top:22px}
 @media(max-width:460px){.annual-business-focuses{grid-template-columns:1fr;gap:0}}
 @media print{.page{padding-bottom:17mm}.annual-business-focuses{grid-template-columns:1fr 1fr;gap:10px}}
+
+/* Keep the opening block compact while retaining the business and scope metadata. */
+#p1 .project-header{padding-top:22px}
+#p1 .project-header .eyebrow{font-size:10px;letter-spacing:1.5px;line-height:1.6;margin:0 0 7px}
+#p1 .project-header h1{font-size:26px;font-weight:650;line-height:1.45;letter-spacing:0;margin:0 0 16px}
+#p1 .project-identity{display:flex;align-items:baseline;flex-wrap:wrap;gap:7px 12px;min-width:0}
+#p1 .project-identity .project-name{font-size:18px;line-height:1.6;margin:0;min-width:0;max-width:100%;overflow-wrap:anywhere}
+#p1 .project-identity .tag{font-size:10px;line-height:1.6;padding:2px 7px;border:0;background:#f3f3f3;flex:0 0 auto}
+#p1 .project-header .meta{font-size:10.5px;line-height:1.8;margin-top:9px;gap:3px 16px;color:#666}
+#p1 .project-header .scope-status{color:#777}
+@media(max-width:760px){#p1 .project-header{padding-top:18px}#p1 .project-header h1{font-size:23px;margin-bottom:13px}#p1 .project-identity .project-name{font-size:17px}#p1 .project-header .meta{gap:3px 12px}}
 </style>
-<link rel="stylesheet" href="assets/workspace.css?v=20261103-annual">
+<link rel="stylesheet" href="assets/workspace.css?v=20261103-hero">
 </head>
 <body class="view-details">
 <header class="app-topbar" data-app-ui><a class="app-brand" href="#" id="home-link"><span class="brand-mark" aria-hidden="true">壹</span><span>GEO 方案工作台</span></a><span class="privacy-badge">报告仅存本机</span></header>
@@ -73,10 +84,11 @@
 <main class="document" id="document" hidden>
 <section class="page" id="p1">
 <div class="masthead"><span class="brand" data-bind="provider"></span><span>GEO 企业服务 · 初步执行方案</span></div>
-<div class="eyebrow">01 / 项目重点</div><h1>围绕贵司业务，<br>安排每一步服务工作</h1>
-<p class="project-name" data-bind="client"></p><span class="tag">初步沟通版 · 执行范围与排期待双方确认</span>
-<div class="meta"><span>方案日期：<span data-bind="date"></span></span><span>拟服务周期：<span data-bind="duration"></span></span></div>
-<div class="rule"></div>
+<div class="project-header">
+<div class="eyebrow">01 / 项目重点</div><h1>围绕贵司业务，安排每一步服务工作</h1>
+<div class="project-identity"><p class="project-name" data-bind="client"></p><span class="tag">初步沟通版</span></div>
+<div class="meta"><span>方案日期：<span data-bind="date"></span></span><span>拟服务周期：<span data-bind="duration"></span></span><span class="scope-status">执行范围与排期待双方确认</span></div>
+</div>
 <div class="section"><div class="section-title"><span>01.1</span><h3>本次服务围绕什么展开</h3></div>
 <dl class="facts business-facts"><div class="fact"><dt>主推业务</dt><dd data-bind="business"></dd></div><div class="fact"><dt>目标客户</dt><dd><span data-bind="audience"></span><span class="region-line" data-optional-field="region">服务区域：<span data-bind="region"></span></span></dd></div><div class="fact"><dt>优先关注</dt><dd data-bind="concern" data-focus="concern"></dd></div><div class="fact"><dt>核心依据与优势</dt><dd data-bind="evidence" data-focus="evidence"></dd></div><div class="fact"><dt>希望承接的行动</dt><dd data-bind="actions" data-focus="actions"></dd></div></dl></div>
 <div class="section"><div class="section-title"><span>01.2</span><h3>从客户真实会问的问题开始</h3></div><p class="small">以下为拟观察问题，启动阶段结合业务与初始诊断确认，不代表已完成测试。</p><ol class="questions" id="questions"></ol></div>
@@ -160,7 +172,7 @@
 <dialog id="new-dialog" data-app-ui aria-labelledby="new-dialog-title"><form method="dialog"><div class="dialog-head"><h2 id="new-dialog-title">新建客户方案</h2><button aria-label="关闭">关闭</button></div><label>客户 / 方案名称<input id="new-name" maxlength="120" placeholder="填写本次服务的客户名称"></label><input id="new-template" type="hidden" value="generic"><p class="small">从通用模板开始，独立保存本次方案。也可以从“更多操作”复制已有方案。</p><button type="button" id="create-plan" class="primary">创建并填写资料</button></form></dialog>
 <dialog id="history-dialog" data-app-ui aria-labelledby="history-dialog-title"><div class="dialog-head"><h2 id="history-dialog-title">历史版本</h2><button id="close-history">关闭</button></div><p class="small">当前稿会自动保存。可通过“更多操作 → 保存一个版本”留存节点，最多保留最近30个版本。</p><div id="history-list"></div><section id="version-preview" hidden><h3 id="version-title"></h3><p id="version-summary"></p><button id="restore-version" class="primary">恢复这个版本</button></section></dialog>
 <script type="application/json" id="saved-state">{}</script>
-<script src="assets/report.js?v=20261103-annual"></script>
-<script src="assets/workspace.js?v=20261103-annual"></script>
-<script src="assets/interface.js?v=20261103-annual"></script>
+<script src="assets/report.js?v=20261103-hero"></script>
+<script src="assets/workspace.js?v=20261103-hero"></script>
+<script src="assets/interface.js?v=20261103-hero"></script>
 </body></html>
