@@ -1,5 +1,23 @@
 'use strict';
-const defaults={client:'客户企业 / 品牌名称',provider:'壹站推',date:'',duration:'待双方确认',business:'',audience:'启动阶段明确目标客户及主要需求',region:'按贵司实际服务范围确认',concern:'确认企业信息是否完整、相关问题中如何呈现，以及优先建设哪些内容。',platforms:'启动阶段根据客户使用场景确认目标 AI 平台',questions:'寻找这类产品或服务时，有哪些企业值得了解？\n选择服务商时应关注哪些条件？\n贵司的产品、服务流程和适用场景是什么？',start:'从双方确认的服务启动日计算；具体日期及启动条件另行确认。',keywords:'关键词及问题范围：首周拟定，第2周共同确认。',scope:'基础工作：企业资料与知识库整理、关键词与问题规划、内容制作、约定发布、监测与服务反馈。\n文章、视频、发布数量及渠道：待双方确认服务清单。\n专项工作是否包含：另行列明。',fee:'',review:'由贵司核对内容涉及的业务事实、价格、参数及品牌表达，汇总反馈后沟通修改，确认版本再发布。具体核对时限与修改安排在启动时确认。',cadence:'拟每周反馈一次服务进展，按月安排内容与发布工作，结合阶段监测开展复盘。具体反馈、复测及复盘频次，须在启动前共同确认。',evidence:'',actions:'',exceptions:'',contact:'启动时确认服务对接人与联系方式'};
+const defaults={client:'',provider:'壹站推',date:'',duration:'待双方确认',business:'',audience:'',region:'',concern:'',platforms:'启动阶段根据客户使用场景确认目标 AI 平台',questions:'',start:'从双方确认的服务启动日计算；具体日期及启动条件另行确认。',keywords:'关键词及问题范围：首周拟定，第2周共同确认。',scope:'基础工作：企业资料与知识库整理、关键词与问题规划、内容制作、约定发布、监测与服务反馈。\n文章、视频、发布数量及渠道：待双方确认服务清单。\n专项工作是否包含：另行列明。',fee:'',review:'由贵司核对内容涉及的业务事实、价格、参数及品牌表达，汇总反馈后沟通修改，确认版本再发布。具体核对时限与修改安排在启动时确认。',cadence:'拟每周反馈一次服务进展，按月安排内容与发布工作，结合阶段监测开展复盘。具体反馈、复测及复盘频次，须在启动前共同确认。',evidence:'',actions:'',exceptions:'',contact:'启动时确认服务对接人与联系方式'};
+const legacyCustomerDefaults = {"client": ["客户企业 / 品牌名称", "未命名客户方案"], "business": ["启动阶段确认本次主推的产品或服务"], "audience": ["启动阶段明确目标客户及主要需求"], "region": ["按贵司实际服务范围确认"], "concern": ["确认企业信息是否完整、相关问题中如何呈现，以及优先建设哪些内容。"], "questions": ["寻找这类产品或服务时，有哪些企业值得了解？\n选择服务商时应关注哪些条件？\n贵司的产品、服务流程和适用场景是什么？"]};
+const customerPlaceholders = {
+  client:'请输入客户企业或品牌名称',
+  business:'填写本次主推的产品或服务',
+  audience:'填写目标客户、采购角色及重点区域',
+  region:'填写需要补充的服务区域（选填）',
+  concern:'填写客户希望解决的问题，或选择下方预设词',
+  evidence:'填写已有资料、真实优势或选择下方资料方向',
+  actions:'填写希望客户采取的行动，或选择下方预设词',
+  questions:'每行填写一个客户真实会问的问题（选填）'
+};
+function normalizeCustomerFields(fields) {
+  const result={...fields};
+  for(const [key,examples] of Object.entries(legacyCustomerDefaults)) {
+    if(examples.includes(result[key]))result[key]='';
+  }
+  return result;
+}
 const fieldDefs=[['evidence','核心依据与优势','textarea','wide'],['actions','希望承接的行动','textarea','wide'],['exceptions','行业或业务例外事项','textarea','wide'],['client','客户企业 / 品牌名称'],['provider','服务方'],['date','方案日期','date'],['business','主推业务 / 产品','textarea'],['audience','目标客户','textarea'],['region','重点服务区域','textarea'],['concern','本次优先关注的问题','textarea','two'],['duration','拟服务周期'],['platforms','拟关注 AI 平台'],['keywords','关键词 / 问题范围','textarea','two'],['questions','拟观察的问题（每行一个，建议3项）','textarea','wide'],['start','服务启动安排','textarea','wide'],['scope','拟服务项目与数量（未确认可保留待定）','textarea','wide'],['cadence','反馈、复测与复盘节奏','textarea','wide'],['review','内容核对安排','textarea','wide'],['fee','服务费用（留空不展示）'],['contact','服务对接与联系方式','text','two']];
 let state = {...defaults};
 if (!state.date) {const d = new Date(); state.date = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
@@ -42,7 +60,7 @@ function dirty() {changed = true;}
 function render() {
   document.querySelectorAll('#document [data-bind]').forEach(el => {
     const key=el.dataset.bind;
-    const fallback={business:'待填写本次主推业务',evidence:'待启动阶段核实资料与优势',actions:'待双方确认承接方式'};
+    const fallback={client:'客户企业',audience:'待启动阶段共同确认',business:'待填写本次主推业务',evidence:'待启动阶段核实资料与优势',actions:'待双方确认承接方式'};
     el.textContent = state[key] || fallback[key] || '';
   });
   renderBusinessFocus();
@@ -61,6 +79,7 @@ function copyPrefix(key) {
   return '';
 }
 function editorValue(key, value) {
+  if(key==='goals' && value===originalCopy.goals)return '';
   const prefix=copyPrefix(key); if (!prefix) return value;
   const base=prefix.slice(0,-1); return value.replace(new RegExp('^'+base+'[：:\\s]*'),'');
 }
@@ -68,7 +87,7 @@ function syncCopyEditors() {
   document.querySelectorAll('[data-copy]').forEach(input => {input.value = editorValue(input.dataset.copy, copyState[input.dataset.copy] || '');});
 }
 function applyReport(data) {
-  state = {...defaults, ...data.fields};
+  state = {...defaults, ...normalizeCustomerFields(data.fields)};
   copyState = {...originalCopy, ...data.copy};
   for (const input of document.querySelectorAll('#fields [name]')) input.value = state[input.name] || '';
   document.querySelectorAll('#document [data-edit]').forEach(el => {el.textContent = copyState[el.dataset.edit] || '';});
@@ -122,6 +141,7 @@ function buildFields() {
       const input=document.createElement(type==='textarea'?'textarea':'input');
       if(type!=='textarea') input.type=type;
       input.name=name; input.value=state[name] || ''; input.id='field-'+name;
+      if(customerPlaceholders[name])input.placeholder=customerPlaceholders[name];
       if(name==='business'){input.required=true;input.setAttribute('aria-required','true');input.placeholder='填写本次主推的产品或服务';}
       if(type==='textarea') input.rows=name==='questions'||name==='scope'?4:3;
       if(hint){const help=document.createElement('span');help.className='field-hint';help.id='hint-'+name;help.textContent=hint;input.setAttribute('aria-describedby',help.id);wrapper.append(title,input,help);}else wrapper.append(title,input);
@@ -151,8 +171,10 @@ function copyEditor(key, label, hint='') {
   const wrapper=document.createElement('label'); wrapper.className='field wide';
   const title=document.createElement('span');title.className='field-title';title.textContent=label;
   const input=document.createElement('textarea');input.dataset.copy=key;input.id='copy-'+key;
-  input.value=editorValue(key,copyState[key] || '');input.rows=(key==='goals'||key==='optional'||key==='boundary')?4:3;
-  input.addEventListener('input',()=>{copyState[key]=copyPrefix(key)+input.value;const target=document.querySelector(`#document [data-edit="${key}"]`);if(target)target.textContent=copyState[key];dirty();document.dispatchEvent(new Event('geo:report-change'));});
+  input.value=editorValue(key,copyState[key] || '');
+  if(key==='goals')input.placeholder='可留空沿用标准服务目标；如需调整，直接填写本次目标';
+  input.rows=(key==='goals'||key==='optional'||key==='boundary')?4:3;
+  input.addEventListener('input',()=>{copyState[key]=key==='goals'&&!input.value.trim()?originalCopy.goals:copyPrefix(key)+input.value;const target=document.querySelector(`#document [data-edit="${key}"]`);if(target)target.textContent=copyState[key];dirty();document.dispatchEvent(new Event('geo:report-change'));});
   wrapper.append(title,input);
   if(hint){const help=document.createElement('span');help.className='field-hint';help.textContent=hint;wrapper.append(help);}
   return wrapper;
@@ -166,7 +188,7 @@ function copySection(container, title, subtitle, entries, open=false) {
   detail.append(summary,fields);container.append(detail);
 }
 function buildCopyEditors() {
-  document.getElementById('goals-editor').append(copyEditor('goals','本次服务希望推动的方向','说明准备怎样回应客户需求，避免承诺固定排名或销量。'));
+  document.getElementById('goals-editor').append(copyEditor('goals','本次服务希望推动的方向（选填调整）','留空时沿用标准服务目标；填写后替换，清空后恢复标准目标。'));
   const schedule=document.getElementById('schedule-editors');
   const stages=[['第1周','了解业务，记录现状',1],['第2周','知识资料与信源准备',2],['第3周','首批内容制作与核对',3],['第4周','发布、复测与调整',4]];
   for(const [title,sub,n] of stages)copySection(schedule,title,sub,[['w'+n,'我们主要做什么'],['d'+n,'客户能看到什么'],['c'+n,'客户需要配合什么']],n===1);

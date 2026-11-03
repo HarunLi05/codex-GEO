@@ -72,10 +72,16 @@ def main():
         network_after_load = []
         page.on('request', lambda request: network_after_load.append(request.url))
 
-        # No business facts or optional examples are selected for a new customer.
-        expect(page.locator('[name="business"]')).to_have_value('')
-        expect(page.locator('[name="evidence"]')).to_have_value('')
-        expect(page.locator('[name="actions"]')).to_have_value('')
+        # Customer instructions are placeholders rather than data users must delete.
+        customer_fields = ('client', 'business', 'audience', 'region', 'concern', 'evidence', 'actions', 'questions')
+        for name in customer_fields:
+            control = page.locator('[name="' + name + '"]')
+            expect(control).to_have_value('')
+            assert control.get_attribute('placeholder'), name + ' should provide a placeholder without becoming report data'
+        expect(page.locator('#copy-goals')).to_have_value('')
+        assert page.locator('#copy-goals').get_attribute('placeholder')
+        assert baseline['copy']['goals'], 'The report must retain its standard goal while the optional override is empty'
+        expect(page.locator('#p1 [data-edit="goals"]')).to_have_text(baseline['copy']['goals'])
         expect(page.locator('[name="region"]')).to_be_hidden()
         assert page.locator('[data-preset-field][aria-pressed="true"]').count() == 0
         page.locator('[data-go-view="service"]').click()
@@ -263,7 +269,10 @@ def main():
             'schema': 1, 'revision': 'legacy-revision', 'activeId': 'legacy-plan',
             'plans': [{
                 'id': 'legacy-plan', 'name': '旧版测试客户', 'updatedAt': '2026-10-27T00:00:00.000Z',
-                'data': {'fields': {**old_fields, 'client': '旧版测试客户', 'business': '旧版本机报告资料'},
+                'data': {'fields': {**old_fields, 'client': '旧版测试客户', 'business': '旧版本机报告资料',
+                                    'audience': '企业采购团队（已有真实资料）', 'region': '华东地区',
+                                    'concern': '客户自填：核实设备适用工况与交付周期',
+                                    'questions': '设备适配哪些工况？\n交付与售后怎样安排？'},
                          'copy': {**old_copy, 'w1': '工作旧版自定义工作', 'goals': '旧版服务目标', 'w5': '工作：旧版每月自定义服务', 'd5': '交付：旧版每月交付'}},
                 'versions': [{'id': 'legacy-version', 'at': '2026-10-27T00:00:00.000Z', 'label': '旧版手动保存',
                               'data': {'fields': old_fields, 'copy': old_copy}}]
@@ -273,6 +282,10 @@ def main():
         legacy = legacy_context.new_page(); legacy.goto(url)
         expect(legacy.locator('[name="client"]')).to_have_value('旧版测试客户')
         expect(legacy.locator('[name="business"]')).to_have_value('旧版本机报告资料')
+        expect(legacy.locator('[name="audience"]')).to_have_value('企业采购团队（已有真实资料）')
+        expect(legacy.locator('[name="region"]')).to_have_value('华东地区')
+        expect(legacy.locator('[name="concern"]')).to_have_value('客户自填：核实设备适用工况与交付周期')
+        expect(legacy.locator('[name="questions"]')).to_have_value('设备适配哪些工况？\n交付与售后怎样安排？')
         expect(legacy.locator('#copy-goals')).to_have_value('旧版服务目标')
         expect(legacy.locator('[name="evidence"]')).to_have_value('')
         expect(legacy.locator('[name="actions"]')).to_have_value('')
@@ -292,6 +305,66 @@ def main():
         legacy.locator('[data-page="p4"]').click()
         for focus_field in ('evidence', 'actions'):
             expect(legacy.locator('#p4 [data-focus="' + focus_field + '"]')).to_be_hidden()
+
+        # Old system instructions are removed from editable fields without losing history.
+        placeholders = {
+            'client': '未命名客户方案',
+            'business': '启动阶段确认本次主推的产品或服务',
+            'audience': '启动阶段明确目标客户及主要需求',
+            'region': '按贵司实际服务范围确认',
+            'concern': '确认企业信息是否完整、相关问题中如何呈现，以及优先建设哪些内容。',
+            'questions': '寻找这类产品或服务时，有哪些企业值得了解？\n选择服务商时应关注哪些条件？\n贵司的产品、服务流程和适用场景是什么？',
+        }
+        placeholder_data = {'fields': {**old_fields, **placeholders}, 'copy': old_copy}
+        placeholder_fixture = {
+            'schema': 1, 'revision': 'placeholder-revision', 'activeId': 'placeholder-plan',
+            'plans': [{'id': 'placeholder-plan', 'name': '未命名客户方案', 'updatedAt': '2026-10-27T00:00:00.000Z',
+                       'data': placeholder_data,
+                       'versions': [{'id': 'original-placeholder-version', 'at': '2026-10-27T00:00:00.000Z',
+                                     'label': '旧版保留记录', 'data': placeholder_data}]}]
+        }
+        placeholder_context = browser.new_context()
+        placeholder_context.add_init_script('if (!localStorage.getItem(' + json.dumps(KEY) + ')) localStorage.setItem(' + json.dumps(KEY) + ', ' + json.dumps(json.dumps(placeholder_fixture, ensure_ascii=False)) + ');')
+        placeholder_page = placeholder_context.new_page(); placeholder_page.goto(url)
+        for name in customer_fields:
+            expect(placeholder_page.locator('[name="' + name + '"]')).to_have_value('')
+        expect(placeholder_page.locator('#copy-goals')).to_have_value('')
+        original_version = placeholder_page.evaluate('JSON.parse(localStorage.getItem(' + json.dumps(KEY) + ')).plans[0].versions.find(v => v.id === "original-placeholder-version")')
+        assert original_version['data']['fields']['audience'] == placeholders['audience']
+        placeholder_page.locator('[name="client"]').fill('更新后填写的客户')
+        placeholder_page.locator('[name="business"]').fill('更新后填写的真实业务')
+        await_saved(placeholder_page)
+        placeholder_page.reload()
+        expect(placeholder_page.locator('[name="client"]')).to_have_value('更新后填写的客户')
+        expect(placeholder_page.locator('[name="business"]')).to_have_value('更新后填写的真实业务')
+        expect(placeholder_page.locator('[name="audience"]')).to_have_value('')
+
+        # Empty customer copies stay empty; names supplied by the user are carried forward.
+        blank_context = browser.new_context()
+        blank_page = blank_context.new_page(); blank_page.goto(url)
+        menu_action(blank_page, '#copy-plan')
+        expect(blank_page.locator('[name="client"]')).to_have_value('')
+        expect(blank_page.locator('.plan-card')).to_have_count(2)
+        blank_page.locator('#new-plan').click()
+        blank_page.locator('#new-name').fill('人工填写的客户名称')
+        blank_page.locator('#create-plan').click()
+        expect(blank_page.locator('[name="client"]')).to_have_value('人工填写的客户名称')
+        for name in customer_fields[1:]:
+            expect(blank_page.locator('[name="' + name + '"]')).to_have_value('')
+
+        # A standard report goal does not require clearing an editor before typing an override.
+        blank_page.locator('.advanced-options > summary').click()
+        expect(blank_page.locator('#copy-goals')).to_have_value('')
+        blank_page.locator('#copy-goals').fill('客户自定义的服务推进目标')
+        await_saved(blank_page)
+        blank_page.reload()
+        expect(blank_page.locator('#copy-goals')).to_have_value('客户自定义的服务推进目标')
+        blank_page.locator('.advanced-options > summary').click()
+        blank_page.locator('#copy-goals').fill('')
+        await_saved(blank_page)
+        blank_page.reload()
+        expect(blank_page.locator('#copy-goals')).to_have_value('')
+        assert blank_page.evaluate('collect().copy.goals') == baseline['copy']['goals']
 
         # On mobile, the library becomes an overlay; choosing a customer closes it.
         page.set_viewport_size({'width': 390, 'height': 844})
@@ -330,7 +403,7 @@ def main():
         expect(blocked_page.locator('#storage-error')).to_contain_text('保存失败')
         expect(blocked_page.locator('#persist-status')).to_contain_text('尚未保存')
         assert not errors, errors
-        print('PASS: five business groups, required business validation, exact preset toggles, annual/monthly editing, three-step workflow, autosave/versions, independent plans, old-schema reports, six-page export/print, backup/import, no uploads, mobile library, multi-tab and storage protection')
+        print('PASS: blank customer fields and placeholders, legacy instruction cleanup, standard goal overrides, five business groups, required business validation, exact preset toggles, annual/monthly editing, three-step workflow, autosave/versions, independent plans, old-schema reports, six-page export/print, backup/import, no uploads, mobile library, multi-tab and storage protection')
         browser.close()
 
 

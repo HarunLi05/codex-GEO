@@ -89,9 +89,9 @@
   }
   function makePlan(template, name) {
     const data = clone(templates[template]);
-    data.fields.client = name || '未命名客户方案';
+    data.fields.client = name || '';
     const d = new Date(); data.fields.date = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    const plan = {id: id(), name: data.fields.client, data, updatedAt: now(), versions: []};
+    const plan = {id: id(), name: data.fields.client || '未命名客户方案', data, updatedAt: now(), versions: []};
     snapshot(plan, '创建方案'); return plan;
   }
   function manualSave() {
@@ -144,7 +144,7 @@
     if (!flush() || conflict) return;
     const before=clone(store);
     const plan={id:id(),name:current().name+'（副本）',data:clone(current().data),updatedAt:now(),versions:[]};
-    plan.data.fields.client=plan.name; snapshot(plan,'复制方案'); store.plans.push(plan); store.activeId=plan.id;
+    plan.data.fields=normalizeCustomerFields(plan.data.fields); if(String(plan.data.fields.client||'').trim())plan.data.fields.client=plan.name; snapshot(plan,'复制方案'); store.plans.push(plan); store.activeId=plan.id;
     if(persist()){apply(plan.data);renderPlans();document.dispatchEvent(new Event('geo:plan-opened'));} else store=before;
   };
   $('show-history').onclick=()=>{if(!flush() || conflict)return; renderHistory();$('history-dialog').showModal();};
@@ -163,7 +163,7 @@
       if(!flush() || conflict)return;
       const before=clone(store);
       // Import as new documents, retaining every existing plan and avoiding ID collisions.
-      for(const p of incoming.plans){const plan=clone(p);plan.id=id();plan.name+='（导入）';plan.data.fields.client=plan.name;plan.versions=plan.versions.slice(0,MAX_VERSIONS);store.plans.push(plan);}
+      for(const p of incoming.plans){const plan=clone(p);plan.id=id();plan.name+='（导入）';plan.data.fields=normalizeCustomerFields(plan.data.fields);if(String(plan.data.fields.client||'').trim())plan.data.fields.client=plan.name;plan.versions=plan.versions.slice(0,MAX_VERSIONS);store.plans.push(plan);}
       if(persist()){renderPlans();say('已导入 '+incoming.plans.length+' 个方案，原有方案已保留。');} else store=before;
     }catch(e){error('导入失败：请选择有效的“GEO方案库备份”JSON文件，现有记录未被替换。');}finally{event.target.value='';}
   };
@@ -175,7 +175,7 @@
   try {
     const raw=localStorage.getItem(KEY);
     if(raw){const parsed=JSON.parse(raw);if(!storeValid(parsed))throw Error('invalid store');store=parsed;}
-    else {const plan=makePlan('generic','未命名客户方案');store.plans=[plan];store.activeId=plan.id;}
+    else {const plan=makePlan('generic','');store.plans=[plan];store.activeId=plan.id;}
     if(persist()){apply(current().data);snapshot(current(),'打开前留存');persist();}
     else apply(current().data);
   } catch(e) {
