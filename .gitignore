@@ -1,0 +1,9 @@
+# Generated customer documents and browser backups belong outside this public repository.
+/reports/
+/exports/
+/backups/
+/proposals/
+*.pdf
+*GEO服务初步执行方案*.html
+*GEO方案库备份*.json
+__pycache__/
