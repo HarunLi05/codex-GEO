@@ -60,13 +60,11 @@
     clearTimeout(timer); timer = setTimeout(flush, 600);
   }
   function apply(data) {
-    setCopyMode(false);
-    state = {...defaults, ...data.fields};
-    for (const input of document.querySelectorAll('#fields [name]')) input.value = state[input.name] || '';
-    document.querySelectorAll('[data-edit]').forEach(el => {el.textContent = data.copy[el.dataset.edit] ?? generic.copy[el.dataset.edit] ?? '';});
-    render(); changed = false;
+    applyReport(data);
+    changed = false;
     $('current-plan-name').textContent = current()?.name || state.client;
-    say('编辑会自动保存；点击“保存版本”可保留当前节点。');
+    say('编辑会自动保存；可从“更多操作”保存历史版本。');
+    document.dispatchEvent(new Event('geo:plan-applied'));
   }
   function renderPlans() {
     const list = $('plan-list'); list.replaceChildren();
@@ -77,7 +75,7 @@
       button.setAttribute('aria-current', String(plan.id === store.activeId)); button.dataset.planId = plan.id;
       const title = document.createElement('strong'); title.textContent = plan.name;
       const meta = document.createElement('span'); meta.textContent = time(plan.updatedAt) + ' · ' + plan.versions.length + '个版本';
-      button.append(title, meta); button.onclick = () => open(plan.id); list.append(button);
+      button.append(title, meta); button.onclick = () => {open(plan.id); document.dispatchEvent(new Event('geo:library-choice'));}; list.append(button);
     }
     if (!plans.length) { const el = document.createElement('div'); el.className='empty-list'; el.textContent='没有匹配的方案，可以新建或更换搜索词。'; list.append(el); }
     $('current-plan-name').textContent = current()?.name || '';
@@ -87,7 +85,7 @@
     if (!flush() || conflict) return;
     const before = clone(store);
     snapshot(current(), '切换前留存'); store.activeId = planId;
-    if (persist()) {apply(current().data); renderPlans();} else store = before;
+    if (persist()) {apply(current().data); renderPlans(); document.dispatchEvent(new Event('geo:plan-opened'));} else store = before;
   }
   function makePlan(template, name) {
     const data = clone(templates[template]);
@@ -138,16 +136,16 @@
     if (!name) {$('new-name').setCustomValidity('请填写客户或方案名称'); $('new-name').reportValidity(); return;}
     $('new-name').setCustomValidity(''); const before=clone(store); snapshot(current(),'新建前留存');
     const plan=makePlan($('new-template').value,name); store.plans.push(plan); store.activeId=plan.id;
-    if (persist()) {apply(plan.data); renderPlans(); $('new-dialog').close();} else store=before;
+    if (persist()) {apply(plan.data); renderPlans(); $('new-dialog').close(); document.dispatchEvent(new Event('geo:plan-opened'));} else store=before;
   };
   $('new-name').oninput=()=> $('new-name').setCustomValidity('');
-  $('new-plan').onclick=()=>{$('new-name').value=''; $('new-dialog').showModal();};
+  $('new-plan').onclick=()=>{document.getElementById('plan-menu').open=false; $('new-name').value=''; $('new-dialog').showModal();};
   $('copy-plan').onclick=()=>{
     if (!flush() || conflict) return;
     const before=clone(store);
     const plan={id:id(),name:current().name+'（副本）',data:clone(current().data),updatedAt:now(),versions:[]};
     plan.data.fields.client=plan.name; snapshot(plan,'复制方案'); store.plans.push(plan); store.activeId=plan.id;
-    if(persist()){apply(plan.data);renderPlans();} else store=before;
+    if(persist()){apply(plan.data);renderPlans();document.dispatchEvent(new Event('geo:plan-opened'));} else store=before;
   };
   $('show-history').onclick=()=>{if(!flush() || conflict)return; renderHistory();$('history-dialog').showModal();};
   $('close-history').onclick=()=> $('history-dialog').close();
@@ -170,7 +168,6 @@
     }catch(e){error('导入失败：请选择有效的“GEO方案库备份”JSON文件，现有记录未被替换。');}finally{event.target.value='';}
   };
   document.addEventListener('input',event=>{if(event.target.closest('#fields') || event.target.closest('[data-edit]'))schedule();});
-  for(const name of ['glasses','generic'])$(name).addEventListener('click',schedule);
   window.addEventListener('pagehide',flush);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flush();});
   window.addEventListener('storage',event=>{if(event.key===KEY)lock();});
