@@ -117,7 +117,7 @@ body{background:var(--app-bg)}
 .export-actions button{font-size:12px;white-space:nowrap}
 .preflight{font-size:11px;line-height:1.9;color:#747474;background:#f8f8f8;border:1px solid #e2e2e2;border-radius:6px;padding:10px 13px;margin-bottom:18px}
 .preflight:empty{display:none}
-.preview-pages{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;padding:5px;border:1px solid #e2e2e2;border-radius:6px;background:#eeeeee}
+.preview-pages{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;padding:5px;border:1px solid #e2e2e2;border-radius:6px;background:#eeeeee}
 .preview-pages button{font-size:11px;text-align:center;padding:8px 5px;border:1px solid transparent;background:transparent;color:#7e7e7e;white-space:nowrap;border-radius:4px}
 .preview-pages button[aria-pressed=true]{background:#ffffff;border-color:#dfdfdf;color:#444444;box-shadow:0 1px 3px #44444410;font-weight:600}
 .preview-pages button:hover{background:#f7f7f7;border-color:transparent}
@@ -149,3 +149,21 @@ dialog .primary{font-size:12px}
 @media(max-width:370px){.app-topbar{padding:0 12px}.privacy-badge{font-size:9px}.app-main{padding-left:10px;padding-right:10px}.workbench-heading h1{font-size:17px}.plan-actions{flex-direction:column-reverse;align-items:flex-end}.workflow button{padding-left:6px;padding-right:6px;gap:5px}.workflow strong{font-size:10px}.step-number{width:21px;height:21px}.service-tabs{gap:13px}.service-tabs button{font-size:10px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
 @media print{body{background:#ffffff}.app-topbar,[data-app-ui],.sidebar-backdrop{display:none!important}.app-layout,.app-main{display:block!important;max-width:none!important;min-height:0!important;width:auto!important;margin:0!important;padding:0!important;border:0!important}.app-main>#document,#document[hidden]{display:block!important;max-width:none!important;width:auto!important;margin:0!important;padding:0!important}.app-main>.document .page,.app-main>.document .page[hidden],#document>.page[hidden]{display:block!important;border:0!important;box-shadow:none!important}.app-sidebar{position:static!important}.library-open{overflow:visible!important}}
+
+/* Business presets stay beside the existing field instead of creating another form. */
+.workbench .field-block{min-width:0}
+.workbench .field-block>.field{margin:0}
+.workbench .preset-options{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+[data-app-ui] .preset-options .preset-chip{display:inline-flex;align-items:center;justify-content:center;max-width:100%;min-height:32px;padding:5px 11px;border:1px solid #d3d3d3;border-radius:999px;background:#fafafa;color:#555555;font-size:11px;font-weight:400;line-height:1.65;text-align:left;white-space:normal;overflow-wrap:anywhere}
+[data-app-ui] .preset-options .preset-chip:hover{border-color:#929292;background:#eeeeee;color:#222222}
+[data-app-ui] .preset-options .preset-chip[aria-pressed=true]{border-color:#555555;background:#333333;color:#ffffff;font-weight:500}
+[data-app-ui] .preset-options .preset-chip[aria-pressed=true]:hover{background:#222222;border-color:#222222;color:#ffffff}
+[data-app-ui] .preset-options .preset-chip:focus-visible{outline:2px solid #777777;outline-offset:3px}
+.workbench .profile-help,.workbench .report-scope-note{font-size:11px;line-height:1.85;color:#666666;margin:10px 0 0;overflow-wrap:anywhere}
+.workbench .optional-field,.workbench .business-exceptions{min-width:0;margin:12px 0 0;padding:10px 12px;border:1px solid #e1e1e1;border-radius:5px;background:#fafafa}
+.workbench .optional-field>summary,.workbench .business-exceptions>summary{cursor:pointer;color:#666666;font-size:11px;line-height:1.8}
+.workbench .optional-field[open]>summary,.workbench .business-exceptions[open]>summary{color:#333333;margin-bottom:10px}
+.workbench .optional-field>.field,.workbench .business-exceptions>.field{margin-top:0}
+.workbench .optional-field .field textarea,.workbench .business-exceptions .field textarea{background:#ffffff}
+.workbench .business-exceptions p{font-size:11px;line-height:1.85;color:#666666;margin:8px 0 0}
+@media(max-width:620px){.workbench .preset-options{gap:6px;margin-top:9px}[data-app-ui] .preset-options .preset-chip{font-size:10px;min-height:33px;padding:5px 10px}.workbench .profile-help,.workbench .report-scope-note{font-size:10px}.workbench .optional-field,.workbench .business-exceptions{padding:9px 10px}.workbench .optional-field>summary,.workbench .business-exceptions>summary{font-size:10px}}
