@@ -45,8 +45,15 @@
 #p2 .timeline{margin-top:16px}
 #p2 .month-header+.business-focus{margin-top:13px;margin-bottom:12px}
 @media(max-width:760px){#p2 .month-header{padding-top:18px}#p2 .month-header h2{font-size:23px}#p2 .month-header .lead{font-size:12px}}
+
+/* Leave enough footer leading for long names without squeezing the page number. */
+.footer{line-height:1.45}
+#p4 .work-row{padding-top:5px;padding-bottom:5px}
+#p5 .section{margin-top:12px}
+.footer>span:first-child{min-width:0;overflow-wrap:anywhere}
+.footer>span:nth-child(2){white-space:nowrap;align-self:start}
 </style>
-<link rel="stylesheet" href="assets/workspace.css?v=20261103-empty-fields">
+<link rel="stylesheet" href="assets/workspace.css?v=20261103-print-questions">
 </head>
 <body class="view-details">
 <header class="app-topbar" data-app-ui><a class="app-brand" href="#" id="home-link"><span class="brand-mark" aria-hidden="true">壹</span><span>GEO 方案工作台</span></a><span class="privacy-badge">报告仅存本机</span></header>
@@ -68,7 +75,7 @@
 <section class="view-panel" id="view-details" role="tabpanel" aria-labelledby="step-details">
 <div class="panel-heading"><h2>先说清楚，这次要推广什么</h2><p>只填写一处核心业务信息，方案中的业务落点会同步展示；标准流程可直接复用。</p></div>
 <section class="form-section"><div class="form-section-heading"><h3>企业与业务</h3><p>填写客户名称、推广对象与目标客群；服务区域按需补充。</p></div><div class="fields" data-field-group="business"></div></section>
-<section class="form-section"><div class="form-section-heading"><h3>推广方向</h3><p>明确客户关注的问题、现有依据和承接方式。预设词需主动选择，并结合真实资料修改。</p></div><div class="fields" data-field-group="direction"></div><details class="optional-field advanced-options"><summary>补充问题清单与调整标准目标（选填）</summary><div class="fields" data-field-group="advanced"></div><div id="goals-editor" class="goals-editor"></div></details></section>
+<section class="form-section"><div class="form-section-heading"><h3>推广方向</h3><p>明确客户关注的问题、现有依据和承接方式。预设词需主动选择，并结合真实资料修改。</p></div><div class="fields" data-field-group="direction"></div><p class="profile-help" id="questions-guidance">专业性较强的业务，建议展开后补充2—3个经客户核实的具体提问；留空仅显示待确认说明，不会自动生成问题。</p><details class="optional-field advanced-options"><summary>补充问题清单与调整标准目标（选填）</summary><div class="fields" data-field-group="advanced"></div><div id="goals-editor" class="goals-editor"></div></details></section>
 <div class="step-actions"><span>修改自动保存，无需手动提交。</span><button class="primary" data-go-view="service">下一步：服务安排 →</button></div>
 </section>
 <section class="view-panel" id="view-service" role="tabpanel" aria-labelledby="step-service" hidden>
@@ -117,7 +124,7 @@
 </div>
 <div class="continuation-note"><strong>首月之后，每月持续交付</strong><p>月度计划、内容与发布台账、监测与问题记录、月度复盘及下一阶段安排，详见下一页年度服务安排。</p></div>
 <p class="small" style="margin-top:13px" data-edit="timing">排期说明：以上为拟定节奏，时间从双方确认的服务启动日计算。具体起算方式、各周安排和持续运营频次，以双方最终确认的排期为准；资料补充、内容核对或平台审核影响进度时，及时沟通调整。</p>
-<div class="footer"><span><span data-bind="client"></span> · GEO服务初步执行方案</span><span>02 / 06</span><span class="footer-note">注：具体内容题材与承接引导方式，以启动阶段双方核实的现有资料与平台规则为准。</span></div>
+<div class="footer"><span><span data-bind="client"></span> · GEO服务初步执行方案</span><span>02 / 06</span></div>
 </section>
 <section class="page annual-page" id="p3">
 <div class="masthead"><span class="brand" data-bind="provider"></span><span>年度服务与月度交付</span></div>
@@ -137,7 +144,7 @@
 </div>
 <div class="annual-handover"><strong>服务期满</strong><p data-edit="w6">工作与交付：汇总执行记录、监测变化与待改进事项，提供服务总结及后续运营建议，与贵司沟通下一阶段重点。</p></div>
 <p class="small annual-note" data-edit="annual_note">以上为拟定安排。实际阶段重点、服务数量、反馈与复测频次，按服务周期、业务变化及双方确认的范围执行；阶段复盘用于判断后续工作方向。</p>
-<div class="footer"><span><span data-bind="client"></span> · GEO服务初步执行方案</span><span>03 / 06</span><span class="footer-note">注：具体内容题材与承接引导方式，以启动阶段双方核实的现有资料与平台规则为准。</span></div>
+<div class="footer"><span><span data-bind="client"></span> · GEO服务初步执行方案</span><span>03 / 06</span></div>
 </section>
 <section class="page" id="p4">
 <div class="masthead"><span class="brand" data-bind="provider"></span><span>工作说明</span></div>
@@ -162,7 +169,7 @@
 <div class="section"><div class="section-title"><span>05.1</span><h3>每周服务周报包含什么</h3></div><div class="sample"><div class="sample-head"><b>服务进展周报</b><span class="tag">栏目示意 · 非实际业绩</span></div><div class="report-grid"><div><strong>01 本周完成</strong><p>资料整理、内容制作、核对与发布情况；对应记录或链接。</p></div><div><strong>02 监测观察</strong><p>约定平台和问题范围内的回答表现；与基线的可比变化。</p></div><div><strong>03 问题跟进</strong><p>信息偏差、发布异常、待核对事项及处理进度。</p></div><div><strong>04 下周安排</strong><p>内容与发布重点、调整事项、需要贵司配合的工作。</p></div></div></div></div>
 <div class="section"><div class="section-title"><span>05.2</span><h3>如何理解监测结果</h3></div><ul class="list"><li data-edit="metric1">核心问题尽量保持一致，记录测试日期、平台及必要条件；新增或变更的问题单独标注，便于解释前后差异。</li><li data-edit="metric2">品牌被提及、出现引用链接、信息描述准确，分别记录；如展示提及率等比例，同时说明样本问题、测试次数及计算口径。</li><li data-edit="metric3">AI 回答会随平台、联网状态和测试时间变化。单次结果用于观察，不代表持续稳定表现；咨询、到店或成交仅在有可核实记录时另行分析。</li></ul></div>
 <div class="box section"><h3>反馈节奏</h3><p class="detail" data-bind="cadence"></p></div>
-<div class="footer"><span><span data-bind="client"></span> · GEO服务初步执行方案</span><span>05 / 06</span><span class="footer-note">注：具体内容题材与承接引导方式，以启动阶段双方核实的现有资料与平台规则为准。</span></div>
+<div class="footer"><span><span data-bind="client"></span> · GEO服务初步执行方案</span><span>05 / 06</span></div>
 </section>
 <section class="page" id="p6">
 <div class="masthead"><span class="brand" data-bind="provider"></span><span>合作与配合</span></div>
@@ -173,7 +180,7 @@
 <div class="scope"><strong>范围及效果说明</strong><p data-edit="boundary">具体服务项目、数量、平台、费用及时间安排，以双方最终确认的服务清单和合同为准。GEO 服务包含资料、内容、发布与监测等执行工作；内容发布不等于 AI 已抓取或引用，不承诺固定排名、指定推荐、询盘或成交结果。</p></div>
 <div class="section"><div class="section-title"><span>06.4</span><h3>期满交付与后续建议</h3></div><p class="detail" data-edit="end">服务期满汇总已完成工作、内容与发布记录、监测变化及仍需改善的事项，形成服务总结；结合贵司后续业务重点，提出信息更新和持续运营建议，再沟通下一阶段安排。</p></div>
 <div class="closing"><h3>下一步：确认业务重点与服务清单</h3><p data-edit="next">明确本次主推业务、目标平台、服务项目与数量，确认启动日和双方对接人后，进入资料收集与首轮诊断。</p><p class="small">服务对接：<span data-bind="contact"></span></p></div>
-<div class="footer"><span><span data-bind="client"></span> · GEO服务初步执行方案</span><span>06 / 06</span><span class="footer-note">注：具体内容题材与承接引导方式，以启动阶段双方核实的现有资料与平台规则为准。</span></div>
+<div class="footer"><span><span data-bind="client"></span> · GEO服务初步执行方案</span><span>06 / 06</span></div>
 </section>
 </main>
 </div></div>
@@ -181,7 +188,7 @@
 <dialog id="new-dialog" data-app-ui aria-labelledby="new-dialog-title"><form method="dialog"><div class="dialog-head"><h2 id="new-dialog-title">新建客户方案</h2><button aria-label="关闭">关闭</button></div><label>客户 / 方案名称<input id="new-name" maxlength="120" placeholder="填写本次服务的客户名称"></label><input id="new-template" type="hidden" value="generic"><p class="small">从通用模板开始，独立保存本次方案。也可以从“更多操作”复制已有方案。</p><button type="button" id="create-plan" class="primary">创建并填写资料</button></form></dialog>
 <dialog id="history-dialog" data-app-ui aria-labelledby="history-dialog-title"><div class="dialog-head"><h2 id="history-dialog-title">历史版本</h2><button id="close-history">关闭</button></div><p class="small">当前稿会自动保存。可通过“更多操作 → 保存一个版本”留存节点，最多保留最近30个版本。</p><div id="history-list"></div><section id="version-preview" hidden><h3 id="version-title"></h3><p id="version-summary"></p><button id="restore-version" class="primary">恢复这个版本</button></section></dialog>
 <script type="application/json" id="saved-state">{}</script>
-<script src="assets/report.js?v=20261103-empty-fields"></script>
-<script src="assets/workspace.js?v=20261103-empty-fields"></script>
-<script src="assets/interface.js?v=20261103-empty-fields"></script>
+<script src="assets/report.js?v=20261103-print-questions"></script>
+<script src="assets/workspace.js?v=20261103-print-questions"></script>
+<script src="assets/interface.js?v=20261103-print-questions"></script>
 </body></html>

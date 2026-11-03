@@ -9,7 +9,7 @@ const customerPlaceholders = {
   concern:'填写客户希望解决的问题，或选择下方预设词',
   evidence:'填写已有资料、真实优势或选择下方资料方向',
   actions:'填写希望客户采取的行动，或选择下方预设词',
-  questions:'每行填写一个客户真实会问的问题（选填）'
+  questions:'每行填写一个经客户确认的具体问题（选填，不会自动生成）'
 };
 function normalizeCustomerFields(fields) {
   const result={...fields};
@@ -46,7 +46,7 @@ const fieldInfo = {
   actions: ['5 · 怎样承接（希望客户采取的行动）','wide','按现有渠道选择，并补充咨询、购买、询价或演示入口；勾选不代表承诺线索或销量。'],
   exceptions: ['行业或业务例外事项（选填）','wide','补充采购周期、资料核对要求、季节性及其他特殊条件。'],
   platforms: ['拟关注 AI 平台','wide','尚未确定时可保留启动阶段共同确认。'],
-  questions: ['拟观察的客户提问','wide','每行一个，建议先填写3个真实提问。'],
+  questions: ['拟观察的客户提问','wide','每行一个，专业性较强的业务建议补充2—3个具体提问，并由客户核实术语和适用范围。'],
   keywords: ['关键词 / 问题范围','wide','先明确范围，再在启动阶段细化清单。'],
   scope: ['服务项目与数量','wide','列出内容类型、发布渠道与数量；未确认部分注明待定。'],
   start: ['服务启动安排','wide','说明起算方式与启动条件，不需要预先承诺日期。'],
@@ -67,6 +67,8 @@ function render() {
   syncPresets();
   const questions = document.getElementById('questions'); questions.replaceChildren();
   const lines = String(state.questions || '').split('\n').map(t => t.trim()).filter(Boolean);
+  const guidance=document.getElementById('questions-guidance');
+  if(guidance)guidance.textContent=lines.length?`已填写 ${lines.length} 个观察问题，将显示在方案第1页；发送前请核对行业术语与业务事实。`:'专业性较强的业务，建议展开后补充2—3个经客户核实的具体提问；留空仅显示待确认说明，不会自动生成问题。';
   (lines.length ? lines : ['启动阶段共同确认拟观察的问题。']).forEach(text => {const li=document.createElement('li');li.textContent=text;questions.append(li);});
   document.getElementById('fee-row').classList.toggle('hidden', !String(state.fee || '').trim());
   document.dispatchEvent(new Event('geo:report-change'));
