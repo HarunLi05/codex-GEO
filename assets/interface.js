@@ -30,7 +30,7 @@
     page=name;
     document.querySelectorAll('#document .page').forEach(el=>el.hidden=el.id!==name);
     document.querySelectorAll('[data-page]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.page===name)));
-    const n=Number(name.slice(1));$('preview-page-label').textContent=`第 ${n} / 6 页 · ${pageTitles[n-1]}`;
+    const n=Number(name.slice(1));$('preview-page-label').textContent=`第 ${n} / 6 章 · ${pageTitles[n-1]}`;
     $('edit-preview-page').textContent=['修改客户资料','修改首月排期','修改年度运营','修改工作说明','修改反馈说明','修改合作配置'][n-1];
     $('edit-preview-extra').hidden=!['p5','p6'].includes(name);
     $('edit-preview-extra').textContent=name==='p5'?'修改反馈频次':'修改边界与总结';

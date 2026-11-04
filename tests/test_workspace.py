@@ -213,33 +213,39 @@ def main():
         download.value.save_as(customer_path)
         customer = context.new_page()
         customer.set_content(customer_path.read_text())
-        assert customer.locator('#document .page:visible').count() == 6
-        assert customer.locator('script').count() == 0
+        assert customer.locator('.report-print .page:visible').count() == 6
+        assert customer.locator('script[src]').count() == 0
+        assert customer.locator('script').count() == 1
+        utility = customer.locator('script').text_content()
+        for forbidden in ('localStorage', 'sessionStorage', 'indexedDB', 'fetch(', 'XMLHttpRequest', 'WebSocket', 'sendBeacon'):
+            assert forbidden not in utility, forbidden
         assert customer.locator('[data-app-ui]').count() == 0
         assert customer.locator('link[rel="stylesheet"]').count() == 0
-        assert '测试企业 <品牌> & 服务' in customer.inner_text('body')
-        assert '工作：首周核对产品资料并记录初始回答。' in customer.inner_text('body')
-        assert customer.locator('#p1 .box .detail').inner_text() == '测试正文：<script>不会执行</script>\n第二行服务目标'
-        assert '第二家测试企业' not in customer.inner_text('body')
-        assert '内部审核提示' not in customer.inner_text('body')
+        assert '测试企业 <品牌> & 服务' in customer.locator('.report-print').inner_text()
+        assert '工作：首周核对产品资料并记录初始回答。' in customer.locator('.report-print').inner_text()
+        assert customer.locator('.report-print .box .detail').first.inner_text() == '测试正文：<script>不会执行</script>\n第二行服务目标'
+        assert '第二家测试企业' not in customer.locator('.report-print').inner_text()
+        assert '内部审核提示' not in customer.locator('.report-print').inner_text()
         assert customer.locator('#plan-list').count() == 0
-        assert '复核重点设备问题，补齐应用与选型资料。' in customer.locator('#p3').inner_text()
-        assert '设备问题对照、补充资料和季度工作复盘。' in customer.locator('#p3').inner_text()
-        assert '汇总本月可核实的咨询反馈，安排下月内容与复测。' in customer.locator('#p3').inner_text()
+        assert '复核重点设备问题，补齐应用与选型资料。' in customer.locator('.report-print').inner_text()
+        assert '设备问题对照、补充资料和季度工作复盘。' in customer.locator('.report-print').inner_text()
+        assert '汇总本月可核实的咨询反馈，安排下月内容与复测。' in customer.locator('.report-print').inner_text()
         for expected_heading in ['第2—3个月', '第4—6个月', '第7—9个月', '第10—12个月', '月度执行计划', '内容及发布台账', '监测与问题记录']:
-            assert expected_heading in customer.locator('#p3').inner_text()
-        assert custom_evidence in customer.locator('#p4').inner_text()
-        assert '联系技术顾问，核实设备适配条件' in customer.locator('#p5').inner_text()
-        assert '不展示未经客户确认的参数或价格' in customer.locator('#p6').inner_text()
-        assert '<script>' not in customer.locator('#p4').inner_html()
+            assert expected_heading in customer.locator('.report-print').inner_text()
+        assert custom_evidence in customer.locator('.report-print').inner_text()
+        assert '联系技术顾问，核实设备适配条件' in customer.locator('.report-print').inner_text()
+        assert '不展示未经客户确认的参数或价格' in customer.locator('.report-print').inner_text()
+        assert '<script>' not in customer.locator('.report-print').inner_html()
 
         # Print from both preview and an editing step must reveal all six report pages.
         for editing in (False, True):
             if editing:
                 page.locator('#step-details').click()
                 expect(page.locator('#document')).to_be_hidden()
+            page.evaluate('window.prepareReportPrint()')
             page.emulate_media(media='print')
-            assert page.locator('#document .page:visible').count() == 6
+            assert page.locator('#prepared-print .page:visible').count() == 6
+            assert not page.locator('#document').is_visible()
             assert not page.locator('.workbench').is_visible()
             assert not page.locator('.app-sidebar').is_visible()
             page.emulate_media(media='screen')
@@ -265,6 +271,9 @@ def main():
         legacy_context = browser.new_context()
         old_fields = {key: value for key, value in baseline['fields'].items() if key not in ('evidence', 'actions', 'exceptions')}
         old_copy = {key: value for key, value in baseline['copy'].items() if not key.startswith(('annual_', 'monthly_'))}
+        legacy_copy = {**old_copy, 'w1': '工作旧版自定义工作', 'd1': '交付旧版首周交付',
+                       'goals': '旧版服务目标', 'w5': '工作旧版每月自定义服务', 'd5': '交付旧版每月交付',
+                       'w6': '工作与交付旧版期满总结'}
         fixture = {
             'schema': 1, 'revision': 'legacy-revision', 'activeId': 'legacy-plan',
             'plans': [{
@@ -273,9 +282,9 @@ def main():
                                     'audience': '企业采购团队（已有真实资料）', 'region': '华东地区',
                                     'concern': '客户自填：核实设备适用工况与交付周期',
                                     'questions': '设备适配哪些工况？\n交付与售后怎样安排？'},
-                         'copy': {**old_copy, 'w1': '工作旧版自定义工作', 'goals': '旧版服务目标', 'w5': '工作：旧版每月自定义服务', 'd5': '交付：旧版每月交付'}},
+                         'copy': legacy_copy},
                 'versions': [{'id': 'legacy-version', 'at': '2026-10-27T00:00:00.000Z', 'label': '旧版手动保存',
-                              'data': {'fields': old_fields, 'copy': old_copy}}]
+                              'data': {'fields': old_fields, 'copy': legacy_copy}}]
             }]
         }
         legacy_context.add_init_script('localStorage.setItem(' + json.dumps(KEY) + ', ' + json.dumps(json.dumps(fixture, ensure_ascii=False)) + ');')
@@ -291,17 +300,21 @@ def main():
         expect(legacy.locator('[name="actions"]')).to_have_value('')
         assert legacy.locator('[data-preset-field][aria-pressed="true"]').count() == 0
         stored = legacy.evaluate('JSON.parse(localStorage.getItem(' + json.dumps(KEY) + '))')
-        assert stored['plans'][0]['data']['copy']['w1'] == '工作旧版自定义工作'
-        assert any(version['id'] == 'legacy-version' for version in stored['plans'][0]['versions'])
+        assert stored['plans'][0]['data']['copy']['w1'] in ('工作旧版自定义工作', '工作：旧版自定义工作')
+        original_legacy_version = next(version for version in stored['plans'][0]['versions'] if version['id'] == 'legacy-version')
+        assert original_legacy_version['data']['copy']['w1'] == '工作旧版自定义工作'
+        assert original_legacy_version['data']['copy']['d1'] == '交付旧版首周交付'
         legacy.locator('#step-service').click()
         legacy.locator('#service-tab-schedule').click()
         expect(legacy.locator('#copy-w1')).to_have_value('旧版自定义工作')
         legacy.locator('#step-preview').click()
         legacy.locator('[data-page="p2"]').click()
-        expect(legacy.locator('[data-edit="w1"]')).to_have_text('工作旧版自定义工作')
+        expect(legacy.locator('#document [data-edit="w1"]')).to_have_text('工作：旧版自定义工作')
+        expect(legacy.locator('#document [data-edit="d1"]')).to_have_text('交付：旧版首周交付')
         legacy.locator('[data-page="p3"]').click()
-        expect(legacy.locator('[data-edit="w5"]')).to_have_text('工作：旧版每月自定义服务')
-        expect(legacy.locator('[data-edit="d5"]')).to_have_text('交付：旧版每月交付')
+        expect(legacy.locator('#document [data-edit="w5"]')).to_have_text('工作：旧版每月自定义服务')
+        expect(legacy.locator('#document [data-edit="d5"]')).to_have_text('交付：旧版每月交付')
+        expect(legacy.locator('#document [data-edit="w6"]')).to_have_text('工作与交付：旧版期满总结')
         legacy.locator('[data-page="p4"]').click()
         for focus_field in ('evidence', 'actions'):
             expect(legacy.locator('#p4 [data-focus="' + focus_field + '"]')).to_be_hidden()
@@ -371,7 +384,7 @@ def main():
         assert_no_horizontal_overflow(page)
         expect(page.locator('#toggle-library')).to_be_visible()
         page.locator('#toggle-library').click()
-        expect(page.locator('body')).to_have_class('view-details library-open')
+        assert {'view-details', 'library-open'} <= set(page.locator('body').get_attribute('class').split())
         expect(page.locator('#plan-sidebar')).to_be_visible()
         page.locator('.plan-card[aria-current="true"]').click()
         assert 'library-open' not in page.locator('body').get_attribute('class')

@@ -6,15 +6,15 @@
 <style id="report-style">
 [data-focus-block][hidden],[data-optional-field][hidden]{display:none!important}
 :root{--ink:#242424;--text:#333333;--muted:#666666;--line:#dddddd;--soft:#f5f5f5;--accent:#555555;--paper:#ffffff}*{box-sizing:border-box}body{margin:0;background:#f3f3f3;color:var(--text);font:14px/1.7 "PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}button,input,textarea{font:inherit}button{cursor:pointer;border:1px solid #d2d2d2;border-radius:5px;padding:7px 13px;background:#ffffff;color:var(--ink)}button:hover{background:var(--soft)}button.primary{background:var(--ink);color:white;border-color:var(--ink)}button:focus-visible,input:focus,textarea:focus{outline:2px solid #898989;outline-offset:2px}a{color:inherit}.toolbar{position:sticky;top:0;z-index:10;background:#ffffff;border-bottom:1px solid var(--line);padding:12px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:0 3px 12px #2b2b2b09}.toolbar strong{margin-right:auto;letter-spacing:1px}.hint{font-size:12px;color:var(--muted)}.workspace{max-width:1240px;margin:auto;padding:24px 18px 50px}.editor{background:white;border:1px solid var(--line);padding:24px;margin:0 auto 25px;max-width:1000px;border-radius:6px}.editor[hidden]{display:none}.editor h2{margin:0 0 8px;font-size:19px}.editor p{margin:5px 0 16px}.fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 18px}.field{display:block;font-size:12px;color:var(--muted)}input,textarea{width:100%;border:1px solid #d2d2d2;border-radius:4px;padding:8px 10px;color:var(--text);background:#ffffff;margin-top:4px}textarea{resize:vertical;min-height:70px}.wide{grid-column:1/-1}.two{grid-column:span 2}.notice{border-left:3px solid #8e8e8e;background:#f7f7f7;padding:10px 14px;font-size:12px;margin:16px 0;color:#5d5d5d}.editor-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.document{max-width:794px;margin:auto}.page{position:relative;background:var(--paper);padding:39px 43px 48px;margin-bottom:22px;min-height:1123px;box-shadow:0 3px 18px #2c2c2c0b}.masthead{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--ink);padding-bottom:12px;font-size:12px;color:var(--muted)}.brand{font-weight:700;color:var(--ink);font-size:16px;letter-spacing:2px}.eyebrow{color:var(--accent);font-size:11px;letter-spacing:2px;margin:30px 0 8px;font-weight:700}h1{font-size:33px;line-height:1.4;letter-spacing:1px;color:var(--ink);margin:8px 0 12px}h2{font-size:25px;line-height:1.5;color:var(--ink);margin:0 0 12px}h3{font-size:15px;color:var(--ink);margin:0 0 8px}p{margin:0 0 11px}.lead{font-size:14px;line-height:1.9;color:#5d5d5d}.rule{height:3px;background:var(--accent);width:36px;margin:21px 0}.project-name{font-size:19px;font-weight:600;line-height:1.6;color:var(--ink);margin:21px 0 8px}.tag{display:inline-block;font-size:11px;padding:2px 8px;border:1px solid var(--line);border-radius:3px;color:var(--muted);max-width:100%;overflow-wrap:anywhere}.meta{font-size:12px;color:var(--muted);margin-top:13px;display:flex;gap:16px;flex-wrap:wrap}.section{margin-top:20px}.section-title{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}.section-title span{font-size:11px;letter-spacing:1px;color:var(--accent)}.section-title h3{margin:0}.facts{border-top:1px solid var(--line)}.fact{display:grid;grid-template-columns:100px 1fr;gap:14px;border-bottom:1px solid var(--line);padding:10px 0;font-size:13px}.fact dt{color:var(--muted)}.fact dd{margin:0;white-space:pre-line;overflow-wrap:anywhere}.box{background:var(--soft);padding:16px 18px;border:1px solid #e8e8e8}.box p:last-child{margin-bottom:0}.small{font-size:12px;color:var(--muted)}.questions{list-style:none;margin:0;padding:0;counter-reset:q}.questions li{counter-increment:q;padding:9px 0;display:flex;gap:14px;border-bottom:1px solid var(--line);font-size:13px;white-space:pre-wrap}.questions li:before{content:"0" counter(q);color:var(--accent);font-size:11px;font-weight:700;padding-top:2px}.footer{position:absolute;bottom:23px;left:43px;right:43px;display:flex;gap:15px;justify-content:space-between;border-top:1px solid var(--line);padding-top:9px;font-size:10px;color:var(--muted)}.footer span:first-child{max-width:82%;overflow-wrap:anywhere}.timeline{margin:20px 0 0;border-top:1px solid var(--ink)}.stage{display:grid;grid-template-columns:85px 1fr;gap:16px;padding:10px 0;border-bottom:1px solid var(--line)}.week{font-weight:700;color:var(--ink);font-size:14px}.week small{display:block;font-weight:400;color:var(--muted);font-size:10px;margin-top:3px}.stage h3{font-size:14px;margin-bottom:5px}.stage p{font-size:12px;line-height:1.7;margin:3px 0}.label{color:var(--accent);font-weight:600;margin-right:6px}.work-row{display:grid;grid-template-columns:32px 1fr;gap:13px;border-top:1px solid var(--line);padding:10px 0}.num{font-size:13px;color:var(--accent);font-weight:600}.work-row h3{font-size:14px;margin-bottom:5px}.work-row p{font-size:12px;line-height:1.75;margin:0 0 5px}.output{color:var(--muted)}table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;margin-top:12px}th{text-align:left;background:var(--soft);font-weight:600;color:var(--ink)}th,td{border-bottom:1px solid var(--line);padding:10px 10px;vertical-align:top;overflow-wrap:anywhere}thead{display:table-header-group}.sample{border:1px solid var(--line);margin-top:12px;padding:16px 18px}.sample-head{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:12px}.sample-head b{font-size:14px;color:var(--ink)}.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;font-size:12px}.report-grid p{margin:3px 0 0;color:var(--muted)}.list{margin:0;padding-left:18px;font-size:12px;line-height:1.9}.list li{margin-bottom:5px}.cols{display:grid;grid-template-columns:1fr 1fr;gap:23px}.detail{font-size:12px;white-space:pre-line;overflow-wrap:anywhere}.scope{border:1px solid var(--line);padding:13px 16px;margin-top:10px}.scope strong{font-size:12px}.scope p{margin:4px 0 0;font-size:12px}#p6 .fact{padding:7px 0}#p6 .scope{padding:10px 14px}#p6 .section{margin-top:16px}.closing{border-top:2px solid var(--ink);margin-top:18px;padding-top:12px}.closing p{font-size:12px;margin:4px 0}.client .toolbar,.client .editor{display:none}.client .workspace{padding-top:24px}.editing [data-edit]{outline:1px dashed #acacac;outline-offset:3px;cursor:text}.editing [data-edit]:focus{outline:2px solid #898989;background:#fcfcfc}.custom-text{white-space:pre-line;overflow-wrap:anywhere}#status{font-size:12px;min-height:20px;color:var(--accent);margin-top:8px}.hidden{display:none!important}
-@media(max-width:760px){.toolbar{padding:10px 12px;gap:7px}.toolbar strong{width:100%;font-size:14px}.toolbar button{font-size:12px;padding:6px 9px}.workspace{padding:14px 8px}.page{padding:28px 23px 58px;min-height:0}.footer{position:static;margin-top:30px;font-size:10px}.fields{grid-template-columns:1fr 1fr}.two{grid-column:span 2}.editor{padding:18px}.stage{grid-template-columns:67px 1fr;gap:10px}h1{font-size:28px}h2{font-size:23px}.fact{grid-template-columns:80px 1fr}.cols{gap:14px}.report-grid{gap:14px}th,td{padding:8px 6px}.masthead{gap:10px}.brand{font-size:14px}}
-@media(max-width:460px){.fields{grid-template-columns:1fr}.two{grid-column:auto}.cols{grid-template-columns:1fr}.report-grid{grid-template-columns:1fr}.meta{gap:4px 12px}}
+@media screen and (max-width:760px){.toolbar{padding:10px 12px;gap:7px}.toolbar strong{width:100%;font-size:14px}.toolbar button{font-size:12px;padding:6px 9px}.workspace{padding:14px 8px}.page{padding:28px 23px 58px;min-height:0}.footer{position:static;margin-top:30px;font-size:10px}.fields{grid-template-columns:1fr 1fr}.two{grid-column:span 2}.editor{padding:18px}.stage{grid-template-columns:67px 1fr;gap:10px}h1{font-size:28px}h2{font-size:23px}.fact{grid-template-columns:80px 1fr}.cols{gap:14px}.report-grid{gap:14px}th,td{padding:8px 6px}.masthead{gap:10px}.brand{font-size:14px}}
+@media screen and (max-width:460px){.fields{grid-template-columns:1fr}.two{grid-column:auto}.cols{grid-template-columns:1fr}.report-grid{grid-template-columns:1fr}.meta{gap:4px 12px}}
 @page{size:A4;margin:0}
 @media print{body{background:white;font-size:13px;print-color-adjust:exact;-webkit-print-color-adjust:exact}.toolbar,.editor{display:none!important}.workspace,.client .workspace{padding:0;max-width:none}.document{max-width:none}.page{width:210mm;height:auto;min-height:297mm;padding:10mm 11.5mm 15mm;margin:0;box-shadow:none;break-after:page;page-break-after:always}.page:last-child{break-after:auto;page-break-after:auto}.footer{position:absolute;bottom:6mm;left:11.5mm;right:11.5mm;margin:0}.cols{grid-template-columns:1fr 1fr}.report-grid{grid-template-columns:1fr 1fr}.editing [data-edit]{outline:none!important}.stage,.work-row,.scope,.sample{break-inside:avoid}h1{font-size:33px}h2{font-size:25px}}
 
 /* Six-page report: structured client focus and an explicit annual service rhythm. */
 .page{padding-bottom:76px}.footer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 14px;font-size:9px;padding-top:8px}.footer span:first-child{max-width:none}.footer-note{grid-column:1/-1;font-size:8.5px;line-height:1.5;max-width:none!important}.region-line{display:block;color:var(--muted);font-size:11px;line-height:1.7;margin-top:3px}.business-focus{display:flex;align-items:baseline;flex-wrap:wrap;gap:5px 12px;margin:13px 0;padding:10px 12px;border:1px solid #d0d0d0;background:#f7f7f7;font-size:11px;line-height:1.7;overflow-wrap:anywhere}.business-focus strong{font-size:11px;color:#292929;flex:0 0 auto}.business-focus>span{min-width:0;flex:1}.focus-chip{display:inline-block;vertical-align:top;max-width:100%;padding:2px 7px;margin:2px 5px 2px 0;border:1px solid #c9c9c9;background:#fff;color:#333;border-radius:3px;white-space:pre-line;overflow-wrap:anywhere}.compact-focus{margin:7px 0;padding:7px 9px;gap:4px 9px}.continuation-note{margin:18px 0 13px;padding:13px 15px;background:#f5f5f5;border-left:3px solid #555;font-size:12px}.continuation-note strong{font-size:12px}.continuation-note p{margin:4px 0 0;font-size:12px}.annual-table{font-size:11px;margin-top:17px}.annual-table th,.annual-table td{padding:8px 9px;line-height:1.65}.annual-table td:first-child strong{font-size:11px;color:#2a2a2a}.annual-table td:first-child small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.annual-monthly{margin-top:17px}.annual-cycle,.annual-service-output{font-size:11px;line-height:1.75;margin:7px 0}.monthly-deliveries{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;border:1px solid #dedede;background:#f7f7f7;padding:11px 14px}.monthly-deliveries>div{padding:5px 0}.monthly-deliveries strong{font-size:11px;color:#2b2b2b}.monthly-deliveries p{font-size:11px;line-height:1.75;margin:4px 0 0}.annual-handover{display:grid;grid-template-columns:72px 1fr;gap:10px;padding:10px 0;margin-top:8px;border-top:1px solid #ddd;font-size:11px;line-height:1.75}.annual-handover p{margin:0;font-size:11px;line-height:1.75}.annual-note{font-size:10px;line-height:1.75;margin-top:9px}#p1 .business-facts .fact{padding:8px 0}#p4 .work-row{padding:7px 0}#p4 .work-row p{line-height:1.6}#p4 .section{margin-top:15px}#p4 .lead{font-size:13px;line-height:1.75}#p4 .business-focus{font-size:10px}#p4 .business-focus strong{font-size:10px}#p4 .focus-chip{padding:1px 6px;font-size:10px}#p5 .monitoring-focus{padding:7px 10px;margin:8px 0}#p5 table{margin-top:10px}#p5 th,#p5 td{padding:8px 9px}#p5 .section{margin-top:16px}#p5 .sample{padding:13px 16px}#p6 .fact{padding:7px 0}#p6 .scope{padding:10px 14px}#p6 .section{margin-top:16px}
-@media(max-width:760px){.page{padding-bottom:40px}.footer{position:static;display:grid;margin-top:25px}.business-focus{display:block}.business-focus strong{display:block;margin-bottom:4px}.annual-table th,.annual-table td{padding:7px 6px}.annual-table{font-size:10px}.annual-handover{grid-template-columns:62px 1fr}.footer-note{font-size:8px}}
-@media(max-width:460px){.monthly-deliveries{grid-template-columns:1fr}.annual-table td:first-child strong{font-size:10px}.annual-table td:first-child small{font-size:9px}.annual-table th,.annual-table td{padding:7px 5px}}
+@media screen and (max-width:760px){.page{padding-bottom:40px}.footer{position:static;display:grid;margin-top:25px}.business-focus{display:block}.business-focus strong{display:block;margin-bottom:4px}.annual-table th,.annual-table td{padding:7px 6px}.annual-table{font-size:10px}.annual-handover{grid-template-columns:62px 1fr}.footer-note{font-size:8px}}
+@media screen and (max-width:460px){.monthly-deliveries{grid-template-columns:1fr}.annual-table td:first-child strong{font-size:10px}.annual-table td:first-child small{font-size:9px}.annual-table th,.annual-table td{padding:7px 5px}}
 @media print{.page{padding-bottom:20mm}.footer{position:absolute;bottom:6mm;left:11.5mm;right:11.5mm;margin:0}.monthly-deliveries{grid-template-columns:1fr 1fr}.annual-table{font-size:11px}.business-focus{display:flex}.business-focus strong{display:inline;margin-bottom:0}.footer-note{font-size:8.5px}.annual-table tr,.monthly-deliveries,.annual-handover{break-inside:avoid}}
 
 /* Keep the default six-page plan within A4 after client focus rows are populated. */
@@ -23,7 +23,7 @@
 #p5 .monitoring-focus{padding:5px 10px;margin:5px 0;font-size:10px;line-height:1.6}#p5 .monitoring-focus strong{font-size:10px}#p5 .focus-chip{font-size:10px;padding:1px 6px}.business-facts [data-focus]:empty:before{content:"启动阶段共同确认";font-size:12px;color:#666}.business-facts .focus-chip{font-size:12px;margin-top:1px;margin-bottom:1px;padding:1px 6px}
 
 .annual-business-focuses{display:grid;grid-template-columns:1fr 1fr;gap:10px}.annual-business-focuses .business-focus{display:block;margin:7px 0;padding:7px 9px}.annual-business-focuses strong{display:block;margin-bottom:4px}#p5 .monitoring-focus{padding:4px 10px;margin:4px 0}#p6 .eyebrow{margin-top:22px}
-@media(max-width:460px){.annual-business-focuses{grid-template-columns:1fr;gap:0}}
+@media screen and (max-width:460px){.annual-business-focuses{grid-template-columns:1fr;gap:0}}
 @media print{.page{padding-bottom:17mm}.annual-business-focuses{grid-template-columns:1fr 1fr;gap:10px}}
 
 /* Keep the opening block compact while retaining the business and scope metadata. */
@@ -35,7 +35,7 @@
 #p1 .project-identity .tag{font-size:10px;line-height:1.6;padding:2px 7px;border:0;background:#f3f3f3;flex:0 0 auto}
 #p1 .project-header .meta{font-size:10.5px;line-height:1.8;margin-top:9px;gap:3px 16px;color:#666}
 #p1 .project-header .scope-status{color:#777}
-@media(max-width:760px){#p1 .project-header{padding-top:18px}#p1 .project-header h1{font-size:23px;margin-bottom:13px}#p1 .project-identity .project-name{font-size:17px}#p1 .project-header .meta{gap:3px 12px}}
+@media screen and (max-width:760px){#p1 .project-header{padding-top:18px}#p1 .project-header h1{font-size:23px;margin-bottom:13px}#p1 .project-identity .project-name{font-size:17px}#p1 .project-header .meta{gap:3px 12px}}
 
 /* Match the concise opening hierarchy on the first-month schedule page. */
 #p2 .month-header{padding-top:22px}
@@ -44,7 +44,7 @@
 #p2 .month-header .lead{font-size:12px;line-height:1.8;margin:0;color:#666}
 #p2 .timeline{margin-top:16px}
 #p2 .month-header+.business-focus{margin-top:13px;margin-bottom:12px}
-@media(max-width:760px){#p2 .month-header{padding-top:18px}#p2 .month-header h2{font-size:23px}#p2 .month-header .lead{font-size:12px}}
+@media screen and (max-width:760px){#p2 .month-header{padding-top:18px}#p2 .month-header h2{font-size:23px}#p2 .month-header .lead{font-size:12px}}
 
 /* Leave enough footer leading for long names without squeezing the page number. */
 .footer{line-height:1.45}
@@ -52,8 +52,65 @@
 #p5 .section{margin-top:12px}
 .footer>span:first-child{min-width:0;overflow-wrap:anywhere}
 .footer>span:nth-child(2){white-space:nowrap;align-self:start}
+
+/* Measured physical sheets. This same layout is used while measuring and while printing. */
+.report-print{width:210mm;max-width:none;margin:0 auto;color:#333;font-size:14px;line-height:1.7}
+.report-print .page{position:relative;width:210mm!important;height:296mm!important;min-height:296mm!important;max-height:none;padding:10mm 11.5mm 18mm!important;margin:0;box-sizing:border-box;border:0!important;overflow:visible;background:#fff;break-inside:avoid;page-break-inside:avoid;break-after:page;page-break-after:always}
+.report-print .page:last-child{break-after:auto;page-break-after:auto}
+.report-print .page>.masthead{font-size:12px;padding-bottom:12px;gap:10px;line-height:1.7}
+.report-print .page>.masthead .brand{font-size:16px}
+.report-print .page>.footer{position:absolute!important;bottom:6mm!important;left:11.5mm!important;right:11.5mm!important;margin:0!important;font-size:9px;line-height:1.45;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 14px}
+.report-print .footer-note{font-size:8.5px;line-height:1.5}
+.report-print .print-page-body{position:absolute;left:11.5mm;right:11.5mm;top:27mm;bottom:19mm;overflow:visible}
+.report-print .print-page-content{position:absolute;left:0;top:0;display:flow-root;width:calc(100% / var(--print-scale,1));transform:scale(var(--print-scale,1));transform-origin:top left}
+.report-print .print-page-content h1{font-size:33px}
+.report-print .print-page-content h2{font-size:25px}
+.report-print .print-page-content :is(.cols,.report-grid,.monthly-deliveries,.annual-business-focuses){grid-template-columns:1fr 1fr}
+.report-print .print-page-content .stage{grid-template-columns:85px 1fr;gap:16px}
+.report-print .print-page-content .fact{grid-template-columns:100px 1fr;gap:14px}
+.report-print .print-page-content .annual-table{font-size:11px}
+.report-print .print-page-content .annual-table th,.report-print .print-page-content .annual-table td{padding:8px 9px}
+.report-print .print-page-content .annual-table td:first-child strong{font-size:11px}
+.report-print .print-page-content .annual-table td:first-child small{font-size:10px}
+.report-print :is(#p1,[data-origin-page="p1"]) .project-header{padding-top:22px}
+.report-print :is(#p1,[data-origin-page="p1"]) .project-header h1{font-size:26px;margin-bottom:16px}
+.report-print :is(#p1,[data-origin-page="p1"]) .project-identity .project-name{font-size:18px}
+.report-print :is(#p2,[data-origin-page="p2"]) .month-header{padding-top:22px}
+.report-print :is(#p2,[data-origin-page="p2"]) .month-header h2{font-size:26px}
+.report-print :is(#p4,[data-origin-page="p4"]) .work-row{padding:5px 0}
+.report-print :is(#p4,[data-origin-page="p4"]) .work-row p{line-height:1.6}
+.report-print :is(#p5,[data-origin-page="p5"]) .section{margin-top:12px}
+.report-print :is(#p6,[data-origin-page="p6"]) .fact{padding:7px 0}
+.report-print .continuation-heading{font-size:13px;line-height:1.6;color:#555;margin:4px 0 12px;border-bottom:1px solid #ddd;padding-bottom:7px}
+.report-print .page[data-print-density="compact"] .print-page-content :is(.section,.annual-monthly){margin-top:10px!important}
+.report-print .page[data-print-density="compact"] .print-page-content .eyebrow{margin-top:17px!important;margin-bottom:6px!important}
+.report-print .page[data-print-density="compact"] .print-page-content :is(.project-header,.month-header){padding-top:14px!important}
+.report-print .page[data-print-density="compact"] .print-page-content h2{font-size:23px!important;line-height:1.4!important;margin-bottom:8px!important}
+.report-print .page[data-print-density="compact"] .print-page-content :is(p,li,td,th,dd){line-height:1.5!important}
+.report-print .page[data-print-density="compact"] .print-page-content :is(.fact,.work-row,.stage){padding-top:4px!important;padding-bottom:4px!important}
+.report-print .page[data-print-density="compact"] .print-page-content .fact{font-size:12px!important}
+.report-print .page[data-print-density="compact"] .print-page-content :is(.business-focus,.scope){margin-top:5px!important;margin-bottom:5px!important;padding:5px 8px!important}
+.report-print .page[data-print-density="compact"] .print-page-content .focus-chip{padding:1px 4px!important;margin:1px 3px 1px 0!important;font-size:10.5px!important}
+.report-print .page[data-print-density="compact"] .print-page-content :is(th,td){padding:5px 7px!important}
+.report-print .page[data-print-density="compact"] .print-page-content :is(.sample,.box,.monthly-deliveries){padding:10px 12px!important}
+.report-print .page[data-print-density="compact"] .print-page-content .continuation-note{margin:10px 0!important;padding:8px 10px!important}
+.report-print .page[data-print-density="compact"] .print-page-content .report-grid{gap:10px 16px!important}
+.report-print .page[data-print-density="compact"] .print-page-content .closing{margin-top:12px!important;padding-top:8px!important}
+#prepared-print{display:none!important}
+body.client{margin:0;background:#eee}
+body.client>.report-print{margin:20px auto}
+body.client>.report-print .page{margin-bottom:20px}
+@media print{
+ @page{size:A4 portrait;margin:0}
+ body.has-print-layout .app-layout,body.has-print-layout [data-app-ui],body.has-print-layout .app-main>#document,body.has-print-layout #document[hidden],body.has-print-layout #document{display:none!important}
+ body.has-print-layout #prepared-print{display:block!important}
+ .report-print,.report-print[hidden]{display:block!important;width:210mm!important;max-width:none!important;margin:0!important;padding:0!important}
+ .report-print .page{display:block!important;width:210mm!important;height:296mm!important;min-height:296mm!important;margin:0!important;box-shadow:none!important}
+ body.client{margin:0;background:white}
+ body.client>.report-print{margin:0}
+}
 </style>
-<link rel="stylesheet" href="assets/workspace.css?v=20261103-print-questions">
+<link rel="stylesheet" href="assets/workspace.css?v=20261104-a4">
 </head>
 <body class="view-details">
 <header class="app-topbar" data-app-ui><a class="app-brand" href="#" id="home-link"><span class="brand-mark" aria-hidden="true">壹</span><span>GEO 方案工作台</span></a><span class="privacy-badge">报告仅存本机</span></header>
@@ -90,10 +147,10 @@
 </section>
 </div>
 <section class="view-panel preview-panel" id="view-preview" role="tabpanel" aria-labelledby="step-preview" hidden>
-<div class="preview-heading"><div class="panel-heading"><h2>检查客户将看到的方案</h2><p>按页预览；导出和打印会包含全部六页。</p></div><div class="export-actions"><button id="export" class="primary">导出客户版 HTML</button><button id="print">打印 / PDF</button></div></div>
-<div id="preflight" class="preflight" role="status"></div>
+<div class="preview-heading"><div class="panel-heading"><h2>检查客户将看到的方案</h2><p>按章节预览；打印前会自动检查 A4 排版。</p></div><div class="export-actions"><button id="export" class="primary">导出客户版 HTML</button><button id="print">打印 / PDF</button></div></div>
+<div id="preflight" class="preflight" role="status"></div><p id="print-layout-status" class="profile-help">打印建议：A4 纵向、缩放100%、边距无，关闭浏览器页眉页脚。导出时先收紧间距，较长内容再适度缩放；过长的章节会完整续页。</p>
 <nav class="preview-pages" aria-label="方案预览页面"><button data-page="p1" aria-pressed="true">1 项目重点</button><button data-page="p2" aria-pressed="false">2 首月排期</button><button data-page="p3" aria-pressed="false">3 年度运营</button><button data-page="p4" aria-pressed="false">4 实际工作</button><button data-page="p5" aria-pressed="false">5 进展反馈</button><button data-page="p6" aria-pressed="false">6 合作范围</button></nav>
-<div class="preview-caption"><span id="preview-page-label">第 1 / 6 页 · 项目重点</span><div class="preview-edit-actions"><button id="edit-preview-page">修改客户资料</button><button id="edit-preview-extra" hidden></button></div></div>
+<div class="preview-caption"><span id="preview-page-label">第 1 / 6 章 · 项目重点</span><div class="preview-edit-actions"><button id="edit-preview-page">修改客户资料</button><button id="edit-preview-extra" hidden></button></div></div>
 </section>
 <p id="status" class="sr-only" role="status" aria-live="polite"></p>
 </section>
@@ -188,7 +245,8 @@
 <dialog id="new-dialog" data-app-ui aria-labelledby="new-dialog-title"><form method="dialog"><div class="dialog-head"><h2 id="new-dialog-title">新建客户方案</h2><button aria-label="关闭">关闭</button></div><label>客户 / 方案名称<input id="new-name" maxlength="120" placeholder="填写本次服务的客户名称"></label><input id="new-template" type="hidden" value="generic"><p class="small">从通用模板开始，独立保存本次方案。也可以从“更多操作”复制已有方案。</p><button type="button" id="create-plan" class="primary">创建并填写资料</button></form></dialog>
 <dialog id="history-dialog" data-app-ui aria-labelledby="history-dialog-title"><div class="dialog-head"><h2 id="history-dialog-title">历史版本</h2><button id="close-history">关闭</button></div><p class="small">当前稿会自动保存。可通过“更多操作 → 保存一个版本”留存节点，最多保留最近30个版本。</p><div id="history-list"></div><section id="version-preview" hidden><h3 id="version-title"></h3><p id="version-summary"></p><button id="restore-version" class="primary">恢复这个版本</button></section></dialog>
 <script type="application/json" id="saved-state">{}</script>
-<script src="assets/report.js?v=20261103-print-questions"></script>
-<script src="assets/workspace.js?v=20261103-print-questions"></script>
-<script src="assets/interface.js?v=20261103-print-questions"></script>
+<script src="assets/print-layout.js?v=20261104-a4"></script>
+<script src="assets/report.js?v=20261104-a4"></script>
+<script src="assets/workspace.js?v=20261104-a4"></script>
+<script src="assets/interface.js?v=20261104-a4"></script>
 </body></html>

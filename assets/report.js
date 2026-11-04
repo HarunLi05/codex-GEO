@@ -80,6 +80,21 @@ function copyPrefix(key) {
   if (key === 'w6') return '工作与交付：';
   return '';
 }
+function normalizeCopyLabels(copy) {
+  const result={...copy};
+  for(const [key,value] of Object.entries(result)) {
+    const prefix=copyPrefix(key);
+    if(!prefix || typeof value!=='string' || !value.trim())continue;
+    const label=prefix.slice(0,-1);
+    const text=value.trimStart();
+    // These fields were historically saved with their display label flattened
+    // into the paragraph. Restore its separator without changing the body.
+    const compound=label==='工作' && /^工作(?:站|量|日|流|台|室|时间)/u.test(text);
+    if(text.startsWith(label) && !compound)result[key]=prefix+text.slice(label.length).replace(/^[：:\s]*/u,'');
+    else result[key]=prefix+text;
+  }
+  return result;
+}
 function editorValue(key, value) {
   if(key==='goals' && value===originalCopy.goals)return '';
   const prefix=copyPrefix(key); if (!prefix) return value;
@@ -90,7 +105,7 @@ function syncCopyEditors() {
 }
 function applyReport(data) {
   state = {...defaults, ...normalizeCustomerFields(data.fields)};
-  copyState = {...originalCopy, ...data.copy};
+  copyState = normalizeCopyLabels({...originalCopy, ...data.copy});
   for (const input of document.querySelectorAll('#fields [name]')) input.value = state[input.name] || '';
   document.querySelectorAll('#document [data-edit]').forEach(el => {el.textContent = copyState[el.dataset.edit] || '';});
   document.querySelectorAll('[data-optional-input]').forEach(details=>{details.open=hasBusinessValue(details.dataset.optionalInput);});
@@ -205,23 +220,49 @@ function buildCopyEditors() {
   copySection(content,'进展反馈与监测','查看方式与观察口径',[['access','客户怎样查看进展'],['metric1','问题范围与可比性'],['metric2','监测记录与比例口径'],['metric3','监测结果的适用限制']]);
   copySection(content,'合作与总结','服务边界与下一步',[['boundary','服务范围与效果说明'],['end','期满交付与后续建议'],['next','下一步安排']]);
 }
+function updatePrintStatus(output) {
+  const count=output.querySelectorAll(':scope > .page').length;
+  const node=document.getElementById('print-layout-status');
+  if(node)node.textContent=`已按 A4 排版为 ${count} 页${count>6?'（含续页，全部文字保留）':''}。打印请选择 A4 纵向、缩放100%、边距无，关闭浏览器页眉页脚。`;
+  return count;
+}
+function prepareReportPrint() {
+  const previous=document.getElementById('prepared-print');
+  if(previous)previous.remove();
+  document.body.classList.remove('has-print-layout');
+  if(!window.GEOPrint)throw new Error('打印组件尚未加载，请刷新后重试。');
+  const output=window.GEOPrint.build(document.getElementById('document'));
+  output.id='prepared-print';document.body.append(output);document.body.classList.add('has-print-layout');
+  updatePrintStatus(output);return output;
+}
+function invalidateReportPrint() {
+  document.body.classList.remove('has-print-layout');
+  const previous=document.getElementById('prepared-print');if(previous)previous.remove();
+}
 function downloadCustomer() {
   if(!requireBusiness())return;
-  const doc=document.implementation.createHTMLDocument(state.client+'｜GEO服务初步执行方案');
-  doc.documentElement.lang='zh-CN';
-  const charset=doc.createElement('meta');charset.setAttribute('charset','utf-8');
-  const viewport=doc.createElement('meta');viewport.name='viewport';viewport.content='width=device-width,initial-scale=1';
-  doc.head.prepend(charset);doc.head.append(viewport,document.getElementById('report-style').cloneNode(true));
-  const report=document.getElementById('document').cloneNode(true);report.hidden=false;
-  report.querySelectorAll('.page').forEach(page=>page.hidden=false);
-  report.querySelectorAll('[data-bind],[data-edit]').forEach(el=>{el.removeAttribute('data-bind');el.removeAttribute('data-edit');el.removeAttribute('contenteditable');});
-  doc.body.className='client';doc.body.append(report);
-  const blob=new Blob(['<!doctype html>\n'+doc.documentElement.outerHTML],{type:'text/html;charset=utf-8'});
-  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;
-  a.download=(state.client||'客户企业').replace(/[\\/:*?"<>|\x00-\x1f]/g,'_')+'_GEO服务初步执行方案_客户版.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);
-  say('已导出完整六页客户版，不包含方案库及编辑工具。');
+  try {
+    const report=document.getElementById('document').cloneNode(true);report.hidden=false;
+    report.querySelectorAll('.page').forEach(page=>page.hidden=false);
+    report.querySelectorAll('[data-bind],[data-edit]').forEach(el=>{el.removeAttribute('data-bind');el.removeAttribute('data-edit');el.removeAttribute('contenteditable');});
+    const prepared=window.GEOPrint.build(report);const count=updatePrintStatus(prepared);prepared.id='standalone-print';
+    const doc=document.implementation.createHTMLDocument((state.client||'客户企业')+'｜GEO服务初步执行方案');doc.documentElement.lang='zh-CN';
+    const charset=doc.createElement('meta');charset.setAttribute('charset','utf-8');
+    const viewport=doc.createElement('meta');viewport.name='viewport';viewport.content='width=device-width,initial-scale=1';
+    const policy=doc.createElement('meta');policy.httpEquiv='Content-Security-Policy';policy.content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'";
+    doc.head.prepend(charset);doc.head.append(viewport,policy,document.getElementById('report-style').cloneNode(true));
+    const source=doc.createElement('template');source.id='report-source';source.content.append(doc.importNode(report,true));
+    doc.body.className='client';doc.body.append(source,doc.importNode(prepared,true));
+    const helper=doc.createElement('script');helper.id='print-layout-inline';helper.textContent=window.GEOPrint.getStandaloneSource().replace(/<\/script/gi,'<\\/script');doc.body.append(helper);
+    const blob=new Blob(['<!doctype html>\n'+doc.documentElement.outerHTML],{type:'text/html;charset=utf-8'});
+    const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;
+    a.download=(state.client||'客户企业').replace(/[\\/:*?"<>|\x00-\x1f]/g,'_')+'_GEO服务初步执行方案_客户版.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);
+    say(`已导出 ${count} 页 A4 客户版；文件包含离线打印排版功能，不包含方案库及编辑工具。`);
+  }catch(error){say('排版未完成：'+error.message);const status=document.getElementById('print-layout-status');if(status)status.textContent='排版未完成：'+error.message;}
 }
 document.getElementById('export').onclick=downloadCustomer;
-document.getElementById('print').onclick=()=>{if(requireBusiness())window.print();};
+document.getElementById('print').onclick=()=>{if(!requireBusiness())return;try{prepareReportPrint();window.print();}catch(error){say(error.message);document.getElementById('print-layout-status').textContent=error.message;}};
+window.addEventListener('beforeprint',()=>{try{prepareReportPrint();}catch(error){say(error.message);}});
+document.addEventListener('geo:report-change',invalidateReportPrint);
 window.addEventListener('beforeunload',event=>{if(changed){event.preventDefault();event.returnValue='';}});
 buildFields();buildCopyEditors();applyReport({fields:state,copy:copyState});
