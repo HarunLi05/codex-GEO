@@ -33,7 +33,7 @@ const fieldGroups = {
   business: ['client','business','audience','region'],
   direction: ['concern','evidence','actions'],
   advanced: ['questions'],
-  contract: ['provider','date','duration','platforms','keywords','scope','fee','contact'],
+  contract: ['provider','date','duration','platforms','keywords','scope','fee'],
   execution: ['start','cadence','review','exceptions']
 };
 const fieldInfo = {

@@ -184,6 +184,45 @@ def main():
         summary.append('legacy prefixes normalized once in actual PDF')
         context.close()
 
+        # Historical contact values may contain review prose; that text must never
+        # populate the fixed service-contact line or leak into a client export.
+        context = browser.new_context(viewport={'width':1280,'height':900}, accept_downloads=True)
+        page = context.new_page(); page.goto(url)
+        review = 'REVIEW_ONLY_MARKER：由客户核对真实业务资料，统一反馈并确认发布版本。'
+        legacy_contact = review + ' LEGACY_CONTACT_MUST_NOT_EXPORT'
+        apply(page, {**BASELINE, 'review': review, 'contact': legacy_contact})
+        fixed_contact = '服务对接：启动时确认服务对接人与联系方式。'
+        assert page.locator('#document #p6 [data-static-contact]').text_content() == fixed_contact
+        assert page.locator('#document #p6 [data-bind="review"]').text_content() == review
+        assert page.locator('[name="contact"]').count() == 0
+        assert page.evaluate('collect().fields.contact') == legacy_contact, 'Legacy data must remain available in local records'
+        page.evaluate('window.prepareReportPrint()')
+        page.emulate_media(media='print')
+        layout = check_layout(page, '#prepared-print', 6)
+        output = root / 'fixed-service-contact.pdf'; page.pdf(path=output, prefer_css_page_size=True, print_background=True)
+        pdf_text = compact(check_pdf(output, 6, layout))
+        assert pdf_text.count('REVIEW_ONLY_MARKER') == 1
+        assert compact(fixed_contact) in pdf_text
+        assert 'LEGACY_CONTACT_MUST_NOT_EXPORT' not in pdf_text
+        page.emulate_media(media='screen')
+        with page.expect_download() as event:
+            page.evaluate('downloadCustomer()')
+        exported = root / 'fixed-service-contact.html'; event.value.save_as(exported)
+        customer = context.new_page(); customer.set_content(exported.read_text())
+        assert customer.locator('.report-print [data-static-contact]').text_content() == fixed_contact
+        assert 'LEGACY_CONTACT_MUST_NOT_EXPORT' not in exported.read_text()
+        assert customer.locator('.report-print').inner_text().count('REVIEW_ONLY_MARKER') == 1
+        customer.emulate_media(media='print')
+        exported_layout = check_layout(customer, '.report-print', 6)
+        output = root / 'fixed-service-contact-standalone.pdf'
+        customer.pdf(path=output, prefer_css_page_size=True, print_background=True)
+        pdf_text = compact(check_pdf(output, 6, exported_layout))
+        assert pdf_text.count('REVIEW_ONLY_MARKER') == 1
+        assert compact(fixed_contact) in pdf_text
+        assert 'LEGACY_CONTACT_MUST_NOT_EXPORT' not in pdf_text
+        summary.append('fixed service contact independent of legacy review/contact values')
+        context.close()
+
         # One genuinely oversized paragraph must continue, never disappear or shrink below the readable limit.
         context = browser.new_context(viewport={'width':1280,'height':900})
         page = context.new_page(); page.goto(url)
