@@ -1,0 +1,5 @@
+# Enter real values only in server secrets or a local ignored .dev.vars file.
+# Never copy real API credentials into this example or the public frontend.
+ASSISTANT_ACCESS_TOKEN=
+DEEPSEEK_API_KEY=
+GEMINI_API_KEY=

@@ -167,3 +167,10 @@ dialog .primary{font-size:12px}
 .workbench .optional-field .field textarea,.workbench .business-exceptions .field textarea{background:#ffffff}
 .workbench .business-exceptions p{font-size:11px;line-height:1.85;color:#666666;margin:8px 0 0}
 @media(max-width:620px){.workbench .preset-options{gap:6px;margin-top:9px}[data-app-ui] .preset-options .preset-chip{font-size:10px;min-height:33px;padding:5px 10px}.workbench .profile-help,.workbench .report-scope-note{font-size:10px}.workbench .optional-field,.workbench .business-exceptions{padding:9px 10px}.workbench .optional-field>summary,.workbench .business-exceptions>summary{font-size:10px}}
+
+/* The content assistant opens separately for deliberate review and manual copying. */
+.app-topbar-actions{display:flex;align-items:center;gap:14px;min-width:0}
+.assistant-entry{display:inline-flex;align-items:center;white-space:nowrap;padding:6px 10px;border:1px solid #d8d8d8;border-radius:5px;background:#fff;color:#333;font-size:12px;line-height:1.6;text-decoration:none}
+.assistant-entry:hover{background:#f4f4f4;border-color:#aaa}
+.assistant-entry:focus-visible{outline:2px solid #666;outline-offset:3px}
+@media screen and (max-width:620px){.app-topbar-actions{gap:8px}.assistant-entry{font-size:11px;padding:5px 8px}.app-topbar-actions .privacy-badge{display:none}}

@@ -1,0 +1,9 @@
+name = "geo-plan-assistant"
+main = "src/worker.mjs"
+compatibility_date = "2026-11-05"
+workers_dev = true
+
+[vars]
+ALLOWED_ORIGINS = "https://harunli05.github.io"
+DEEPSEEK_MODEL = "deepseek-chat"
+GEMINI_MODEL = "gemini-flash-latest"
