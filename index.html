@@ -62,7 +62,8 @@
 .report-print .page>.footer{position:absolute!important;bottom:6mm!important;left:11.5mm!important;right:11.5mm!important;margin:0!important;font-size:9px;line-height:1.45;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 14px}
 .report-print .footer-note{font-size:8.5px;line-height:1.5}
 .report-print .print-page-body{position:absolute;left:11.5mm;right:11.5mm;top:27mm;bottom:19mm;overflow:visible}
-.report-print .print-page-content{position:absolute;left:0;top:0;display:flow-root;width:calc(100% / var(--print-scale,1));transform:scale(var(--print-scale,1));transform-origin:top left}
+/* An inline block keeps the measured, transformed sheet monolithic in Chromium PDF output. */
+.report-print .print-page-content{position:relative;left:0;top:0;display:inline-block;vertical-align:top;width:calc(100% / var(--print-scale,1));transform:scale(var(--print-scale,1));transform-origin:top left}
 .report-print .print-page-content h1{font-size:33px}
 .report-print .print-page-content h2{font-size:25px}
 .report-print .print-page-content :is(.cols,.report-grid,.monthly-deliveries,.annual-business-focuses){grid-template-columns:1fr 1fr}
@@ -109,8 +110,15 @@ body.client>.report-print .page{margin-bottom:20px}
  body.client{margin:0;background:white}
  body.client>.report-print{margin:0}
 }
+/* Keep the service scope and quotation visible in screen previews and both PDF paths. */
+:is(#p6,[data-origin-page="p6"]) .service-config-facts{margin:0}
+:is(#p6,[data-origin-page="p6"]) .quote-summary{margin:8px 0 0;border:1px solid #bdbdbd;border-left:3px solid #555;background:#f5f5f5;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+:is(#p6,[data-origin-page="p6"]) .quote-summary .fact{padding:8px 12px;border-bottom:0}
+:is(#p6,[data-origin-page="p6"]) .quote-summary dt{font-weight:650;color:#333}
+:is(#p6,[data-origin-page="p6"]) .quote-summary .quote-fee{background:#e8e8e8;border-top:1px solid #bdbdbd}
+:is(#p6,[data-origin-page="p6"]) .quote-summary .quote-fee dd{font-size:14px;font-weight:700;color:#222;line-height:1.65}
 </style>
-<link rel="stylesheet" href="assets/workspace.css?v=20261105-ai-assistant">
+<link rel="stylesheet" href="assets/workspace.css?v=20261110-quote">
 </head>
 <body class="view-details">
 <header class="app-topbar" data-app-ui><a class="app-brand" href="#" id="home-link"><span class="brand-mark" aria-hidden="true">壹</span><span>GEO 方案工作台</span></a><div class="app-topbar-actions"><a class="assistant-entry" href="assistant.html" target="_blank" rel="noopener">AI 内容助手 ↗</a><span class="privacy-badge">报告仅存本机</span></div></header>
@@ -138,8 +146,8 @@ body.client>.report-print .page{margin-bottom:20px}
 <section class="view-panel" id="view-service" role="tabpanel" aria-labelledby="step-service" hidden>
 <div class="panel-heading"><h2>把服务范围、排期和交付对齐</h2><p>先确认服务配置，再按需调整阶段工作和对客说明。</p></div>
 <details class="review-note"><summary>对客前需确认：服务范围、排期与反馈频次</summary><p>当前为初步沟通版。服务启动日的起算方式、各周安排、内容与发布数量、反馈及复测频次，需内部确认后再对客使用。</p></details>
-<nav class="service-tabs" aria-label="服务安排栏目" role="tablist"><button id="service-tab-config" data-service-tab="config" role="tab" aria-controls="service-config" aria-selected="true">服务配置</button><button id="service-tab-schedule" data-service-tab="schedule" role="tab" aria-controls="service-schedule" aria-selected="false">首月排期</button><button id="service-tab-annual" data-service-tab="annual" role="tab" aria-controls="service-annual" aria-selected="false">年度运营</button><button id="service-tab-content" data-service-tab="content" role="tab" aria-controls="service-content" aria-selected="false">工作说明</button></nav>
-<div id="service-config" class="service-panel" role="tabpanel" aria-labelledby="service-tab-config"><section class="form-section"><div class="form-section-heading"><h3>本次服务配置</h3><p>数量、平台和费用尚未确认时，可保留待定。</p></div><div class="fields" data-field-group="contract"></div></section><section class="form-section"><div class="form-section-heading"><h3>启动与配合</h3><p>让客户知道何时启动、怎样核对内容、多久收到反馈。</p></div><div class="fields" data-field-group="execution"></div></section></div>
+<nav class="service-tabs" aria-label="服务安排栏目" role="tablist"><button id="service-tab-config" data-service-tab="config" role="tab" aria-controls="service-config" aria-selected="true">服务内容与报价</button><button id="service-tab-schedule" data-service-tab="schedule" role="tab" aria-controls="service-schedule" aria-selected="false">首月排期</button><button id="service-tab-annual" data-service-tab="annual" role="tab" aria-controls="service-annual" aria-selected="false">年度运营</button><button id="service-tab-content" data-service-tab="content" role="tab" aria-controls="service-content" aria-selected="false">工作说明</button></nav>
+<div id="service-config" class="service-panel" role="tabpanel" aria-labelledby="service-tab-config"><section class="form-section"><div class="form-section-heading"><h3>本次服务内容与报价</h3><p>列明服务周期、交付数量及报价；未确认部分可注明待定，费用留空不展示。</p></div><div class="fields" data-field-group="contract"></div></section><section class="form-section"><div class="form-section-heading"><h3>启动与配合</h3><p>让客户知道何时启动、怎样核对内容、多久收到反馈。</p></div><div class="fields" data-field-group="execution"></div></section></div>
 <div id="service-schedule" class="service-panel" role="tabpanel" aria-labelledby="service-tab-schedule" hidden><p class="section-help">已提供首月标准排期，展开需要调整的阶段即可。每个阶段分别说明工作、交付和客户配合。全年安排在“年度运营”中单独确认。</p><div id="schedule-editors"></div></div>
 <div id="service-annual" class="service-panel" role="tabpanel" aria-labelledby="service-tab-annual" hidden><p class="section-help">按年度阶段推进，每月持续交付计划、内容与发布记录、监测问题清单及复盘。默认安排用于12个月服务参考，按合同范围与客户业务调整。</p><div id="annual-editors"></div></div>
 <div id="service-content" class="service-panel" role="tabpanel" aria-labelledby="service-tab-content" hidden><p class="section-help">这些内容会展示在方案第4—6页。标准内容可以直接沿用，有实际差异时再修改。</p><div id="content-editors"></div></div>
@@ -231,7 +239,7 @@ body.client>.report-print .page{margin-bottom:20px}
 <section class="page" id="p6">
 <div class="masthead"><span class="brand" data-bind="provider"></span><span>合作与配合</span></div>
 <div class="eyebrow">06 / 合作范围</div><h2>把范围和配合事项先对齐</h2><p class="lead">将服务项目、数量与双方配合方式确认清楚，再据此落实执行排期。</p>
-<div class="section"><div class="section-title"><span>06.1</span><h3>本次拟定服务配置</h3></div><dl class="facts"><div class="fact"><dt>服务方</dt><dd data-bind="provider"></dd></div><div class="fact"><dt>服务周期</dt><dd data-bind="duration"></dd></div><div class="fact"><dt>启动安排</dt><dd data-bind="start"></dd></div><div class="fact"><dt>平台与问题</dt><dd><span data-bind="platforms"></span><br><span data-bind="keywords"></span></dd></div><div class="fact"><dt>项目与数量</dt><dd data-bind="scope"></dd></div><div class="fact" id="fee-row"><dt>服务费用</dt><dd data-bind="fee"></dd></div></dl></div>
+<div class="section service-configuration"><div class="section-title"><span>06.1</span><h3>服务清单与报价</h3></div><dl class="facts service-config-facts"><div class="fact"><dt>服务方</dt><dd data-bind="provider"></dd></div><div class="fact"><dt>服务周期</dt><dd data-bind="duration"></dd></div><div class="fact"><dt>启动安排</dt><dd data-bind="start"></dd></div><div class="fact"><dt>平台与问题</dt><dd><span data-bind="platforms"></span><br><span data-bind="keywords"></span></dd></div></dl><dl class="facts quote-summary"><div class="fact quote-scope"><dt>服务项目与数量</dt><dd data-bind="scope"></dd></div><div class="fact quote-fee" id="fee-row"><dt>服务费用</dt><dd data-bind="fee"></dd></div></dl></div>
 <div class="section cols"><div><div class="section-title"><span>06.2</span><h3>我们负责</h3></div><ul class="list"><li>安排服务对接人，组织资料与执行工作。</li><li>在约定范围内制作内容、安排发布、开展监测与更新。</li><li>留存工作记录，反馈进展、问题和后续安排。</li></ul></div><div><div class="section-title"><span>06.3</span><h3>贵司配合</h3></div><ul class="list"><li>指定对接人，提供真实、可使用的业务资料。</li><li>核对内容事实、资质及授权，集中反馈意见。</li><li>及时同步产品、价格、门店与业务重点的变化。</li></ul></div></div>
 <div class="scope"><strong>内容核对与进度衔接</strong><p class="custom-text" data-bind="review"></p><p class="exception-line custom-text" data-optional-field="exceptions" hidden><strong>例外事项：</strong><span data-bind="exceptions"></span></p></div>
 <div class="scope"><strong>范围及效果说明</strong><p data-edit="boundary">具体服务项目、数量、平台、费用及时间安排，以双方最终确认的服务清单和合同为准。GEO 服务包含资料、内容、发布与监测等执行工作；内容发布不等于 AI 已抓取或引用，不承诺固定排名、指定推荐、询盘或成交结果。</p></div>
@@ -245,8 +253,8 @@ body.client>.report-print .page{margin-bottom:20px}
 <dialog id="new-dialog" data-app-ui aria-labelledby="new-dialog-title"><form method="dialog"><div class="dialog-head"><h2 id="new-dialog-title">新建客户方案</h2><button aria-label="关闭">关闭</button></div><label>客户 / 方案名称<input id="new-name" maxlength="120" placeholder="填写本次服务的客户名称"></label><input id="new-template" type="hidden" value="generic"><p class="small">从通用模板开始，独立保存本次方案。也可以从“更多操作”复制已有方案。</p><button type="button" id="create-plan" class="primary">创建并填写资料</button></form></dialog>
 <dialog id="history-dialog" data-app-ui aria-labelledby="history-dialog-title"><div class="dialog-head"><h2 id="history-dialog-title">历史版本</h2><button id="close-history">关闭</button></div><p class="small">当前稿会自动保存。可通过“更多操作 → 保存一个版本”留存节点，最多保留最近30个版本。</p><div id="history-list"></div><section id="version-preview" hidden><h3 id="version-title"></h3><p id="version-summary"></p><button id="restore-version" class="primary">恢复这个版本</button></section></dialog>
 <script type="application/json" id="saved-state">{}</script>
-<script src="assets/print-layout.js?v=20261105-ai-assistant"></script>
-<script src="assets/report.js?v=20261105-ai-assistant"></script>
-<script src="assets/workspace.js?v=20261105-ai-assistant"></script>
-<script src="assets/interface.js?v=20261105-ai-assistant"></script>
+<script src="assets/print-layout.js?v=20261110-quote"></script>
+<script src="assets/report.js?v=20261110-quote"></script>
+<script src="assets/workspace.js?v=20261110-quote"></script>
+<script src="assets/interface.js?v=20261110-quote"></script>
 </body></html>

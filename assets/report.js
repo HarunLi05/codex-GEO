@@ -18,7 +18,7 @@ function normalizeCustomerFields(fields) {
   }
   return result;
 }
-const fieldDefs=[['evidence','核心依据与优势','textarea','wide'],['actions','希望承接的行动','textarea','wide'],['exceptions','行业或业务例外事项','textarea','wide'],['client','客户企业 / 品牌名称'],['provider','服务方'],['date','方案日期','date'],['business','主推业务 / 产品','textarea'],['audience','目标客户','textarea'],['region','重点服务区域','textarea'],['concern','本次优先关注的问题','textarea','two'],['duration','拟服务周期'],['platforms','拟关注 AI 平台'],['keywords','关键词 / 问题范围','textarea','two'],['questions','拟观察的问题（每行一个，建议3项）','textarea','wide'],['start','服务启动安排','textarea','wide'],['scope','拟服务项目与数量（未确认可保留待定）','textarea','wide'],['cadence','反馈、复测与复盘节奏','textarea','wide'],['review','内容核对安排','textarea','wide'],['fee','服务费用（留空不展示）'],['contact','服务对接与联系方式','text','two']];
+const fieldDefs=[['evidence','核心依据与优势','textarea','wide'],['actions','希望承接的行动','textarea','wide'],['exceptions','行业或业务例外事项','textarea','wide'],['client','客户企业 / 品牌名称'],['provider','服务方'],['date','方案日期','date'],['business','主推业务 / 产品','textarea'],['audience','目标客户','textarea'],['region','重点服务区域','textarea'],['concern','本次优先关注的问题','textarea','two'],['duration','拟服务周期'],['platforms','拟关注 AI 平台'],['keywords','关键词 / 问题范围','textarea','two'],['questions','拟观察的问题（每行一个，建议3项）','textarea','wide'],['start','服务启动安排','textarea','wide'],['scope','拟服务项目与数量（未确认可保留待定）','textarea','wide'],['cadence','反馈、复测与复盘节奏','textarea','wide'],['review','内容核对安排','textarea','wide'],['fee','服务费用（留空不展示）','textarea','wide'],['contact','服务对接与联系方式','text','two']];
 let state = {...defaults};
 if (!state.date) {const d = new Date(); state.date = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 let changed = false;
@@ -48,12 +48,12 @@ const fieldInfo = {
   platforms: ['拟关注 AI 平台','wide','尚未确定时可保留启动阶段共同确认。'],
   questions: ['拟观察的客户提问','wide','每行一个，专业性较强的业务建议补充2—3个具体提问，并由客户核实术语和适用范围。'],
   keywords: ['关键词 / 问题范围','wide','先明确范围，再在启动阶段细化清单。'],
-  scope: ['服务项目与数量','wide','列出内容类型、发布渠道与数量；未确认部分注明待定。'],
+  scope: ['服务项目与数量','wide','列出内容类型、渠道、数量及按月或全期的口径。活动可分行写常规数量、加赠数量与合计；未确认部分注明待定。'],
   start: ['服务启动安排','wide','说明起算方式与启动条件，不需要预先承诺日期。'],
   cadence: ['反馈与复测节奏','wide','说明周报、监测和阶段复盘的拟定频次。'],
   review: ['内容核对安排','wide','明确客户如何核对事实、汇总修改并确认发布。'],
   contact: ['服务对接与联系方式','wide','未确认可以保留启动时确认。'],
-  fee: ['服务费用（选填）','','留空时，客户版不展示费用。']
+  fee: ['服务费用（选填）','wide','可分行填写总报价、对应周期、是否含税及付款安排。留空时，客户版不展示费用。']
 };
 function say(text) {document.getElementById('status').textContent = text;}
 function dirty() {changed = true;}
