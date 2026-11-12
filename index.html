@@ -118,7 +118,7 @@ body.client>.report-print .page{margin-bottom:20px}
 :is(#p6,[data-origin-page="p6"]) .quote-summary .quote-fee{background:#e8e8e8;border-top:1px solid #bdbdbd}
 :is(#p6,[data-origin-page="p6"]) .quote-summary .quote-fee dd{font-size:14px;font-weight:700;color:#222;line-height:1.65}
 </style>
-<link rel="stylesheet" href="assets/workspace.css?v=20261110-quote">
+<link rel="stylesheet" href="assets/workspace.css?v=20261112-full-plan">
 </head>
 <body class="view-details">
 <header class="app-topbar" data-app-ui><a class="app-brand" href="#" id="home-link"><span class="brand-mark" aria-hidden="true">壹</span><span>GEO 方案工作台</span></a><div class="app-topbar-actions"><a class="assistant-entry" href="assistant.html" target="_blank" rel="noopener">AI 内容助手 ↗</a><span class="privacy-badge">报告仅存本机</span></div></header>
@@ -149,7 +149,7 @@ body.client>.report-print .page{margin-bottom:20px}
 <nav class="service-tabs" aria-label="服务安排栏目" role="tablist"><button id="service-tab-config" data-service-tab="config" role="tab" aria-controls="service-config" aria-selected="true">服务内容与报价</button><button id="service-tab-schedule" data-service-tab="schedule" role="tab" aria-controls="service-schedule" aria-selected="false">首月排期</button><button id="service-tab-annual" data-service-tab="annual" role="tab" aria-controls="service-annual" aria-selected="false">年度运营</button><button id="service-tab-content" data-service-tab="content" role="tab" aria-controls="service-content" aria-selected="false">工作说明</button></nav>
 <div id="service-config" class="service-panel" role="tabpanel" aria-labelledby="service-tab-config"><section class="form-section"><div class="form-section-heading"><h3>本次服务内容与报价</h3><p>列明服务周期、交付数量及报价；未确认部分可注明待定，费用留空不展示。</p></div><div class="fields" data-field-group="contract"></div></section><section class="form-section"><div class="form-section-heading"><h3>启动与配合</h3><p>让客户知道何时启动、怎样核对内容、多久收到反馈。</p></div><div class="fields" data-field-group="execution"></div></section></div>
 <div id="service-schedule" class="service-panel" role="tabpanel" aria-labelledby="service-tab-schedule" hidden><p class="section-help">已提供首月标准排期，展开需要调整的阶段即可。每个阶段分别说明工作、交付和客户配合。全年安排在“年度运营”中单独确认。</p><div id="schedule-editors"></div></div>
-<div id="service-annual" class="service-panel" role="tabpanel" aria-labelledby="service-tab-annual" hidden><p class="section-help">按年度阶段推进，每月持续交付计划、内容与发布记录、监测问题清单及复盘。默认安排用于12个月服务参考，按合同范围与客户业务调整。</p><div id="annual-editors"></div></div>
+<div id="service-annual" class="service-panel" role="tabpanel" aria-labelledby="service-tab-annual" hidden><p class="section-help" id="annual-period-help">按服务周期分阶段推进，每月留存计划、内容发布、监测与复盘记录；实际周期待双方确认。</p><div id="annual-editors"></div></div>
 <div id="service-content" class="service-panel" role="tabpanel" aria-labelledby="service-tab-content" hidden><p class="section-help">这些内容会展示在方案第4—6页。标准内容可以直接沿用，有实际差异时再修改。</p><div id="content-editors"></div></div>
 <div class="step-actions"><button data-go-view="details">← 客户资料</button><button class="primary" data-go-view="preview">下一步：预览与导出 →</button></div>
 </section>
@@ -192,15 +192,15 @@ body.client>.report-print .page{margin-bottom:20px}
 <div class="footer"><span><span data-bind="client"></span> · GEO服务初步执行方案</span><span>02 / 06</span></div>
 </section>
 <section class="page annual-page" id="p3">
-<div class="masthead"><span class="brand" data-bind="provider"></span><span>年度服务与月度交付</span></div>
-<div class="eyebrow">03 / 全年推进安排</div><h2>每月有执行，阶段有积累</h2><p class="lead">以12个月服务为讨论示例。持续更新业务资料、内容与公开信息，通过监测和复盘确定下一轮重点。</p>
-<div class="annual-business-focuses"><div class="business-focus" data-focus-block hidden><strong>本年度主推业务</strong><span data-focus="business"></span></div><div class="business-focus" data-focus-block hidden><strong>重点影响的客户</strong><span data-focus="audience"></span></div></div>
+<div class="masthead"><span class="brand" data-bind="provider"></span><span>服务期与月度交付</span></div>
+<div class="eyebrow">03 / 服务期推进安排</div><h2>每月有执行，阶段有积累</h2><p class="lead" data-period-lead>以下为阶段安排参考，实际服务周期待双方确认；按月执行、留档、观察与调整。</p>
+<div class="annual-business-focuses"><div class="business-focus" data-focus-block hidden><strong>本服务期主推业务</strong><span data-focus="business"></span></div><div class="business-focus" data-focus-block hidden><strong>重点影响的客户</strong><span data-focus="audience"></span></div></div>
 <table class="annual-table"><colgroup><col style="width:16%"><col style="width:46%"><col style="width:38%"></colgroup><thead><tr><th>时间与重点</th><th>主要推进工作</th><th>阶段可见交付</th></tr></thead><tbody>
-<tr><td><strong>第1个月</strong><small>建立基础</small></td><td data-edit="annual_stage1_work">梳理业务与知识资料，确认问题范围，完成首批内容与发布，记录初始回答。</td><td data-edit="annual_stage1_output">初始诊断、知识资料、首批内容与发布记录。</td></tr>
-<tr><td><strong>第2—3个月</strong><small>验证与补齐</small></td><td data-edit="annual_stage2_work">复测重点问题，核对信息偏差，补充核心产品、服务和选购问答。</td><td data-edit="annual_stage2_output">问题覆盖清单、监测对照、补充内容及首阶段复盘。</td></tr>
-<tr><td><strong>第4—6个月</strong><small>扩展场景</small></td><td data-edit="annual_stage3_work">结合产品、客群、区域与使用场景拓展内容，观察公开竞品信息与覆盖差距。</td><td data-edit="annual_stage3_output">场景内容、覆盖差距分析、半年复盘与调整计划。</td></tr>
-<tr><td><strong>第7—9个月</strong><small>深化与更新</small></td><td data-edit="annual_stage4_work">随新品、业务重点及客户反馈更新内容，修正过时或不一致的信息。</td><td data-edit="annual_stage4_output">信息更新记录、重点业务内容、专项观察与阶段复盘。</td></tr>
-<tr><td><strong>第10—12个月</strong><small>汇总与规划</small></td><td data-edit="annual_stage5_work">维护核心信息，汇总全年覆盖变化、遗留问题及可核实的业务反馈。</td><td data-edit="annual_stage5_output">年度执行汇总、监测变化、知识资产清单与后续建议。</td></tr>
+<tr data-period-stage="1"><td><strong data-stage-label>第1个月</strong><small>建立基础</small></td><td data-edit="annual_stage1_work">梳理业务与知识资料，确认问题范围，完成首批内容与发布，记录初始回答。</td><td data-edit="annual_stage1_output">初始诊断、知识资料、首批内容与发布记录。</td></tr>
+<tr data-period-stage="2"><td><strong data-stage-label>第2—3个月</strong><small>验证与补齐</small></td><td data-edit="annual_stage2_work">复测重点问题，核对信息偏差，补充核心产品、服务和选购问答。</td><td data-edit="annual_stage2_output">问题覆盖清单、监测对照、补充内容及首阶段复盘。</td></tr>
+<tr data-period-stage="3"><td><strong data-stage-label>第4—6个月</strong><small>扩展场景</small></td><td data-edit="annual_stage3_work">结合产品、客群、区域与使用场景拓展内容，观察公开竞品信息与覆盖差距。</td><td data-edit="annual_stage3_output">场景内容、覆盖差距分析、半年复盘与调整计划。</td></tr>
+<tr data-period-stage="4"><td><strong data-stage-label>第7—9个月</strong><small>深化与更新</small></td><td data-edit="annual_stage4_work">随新品、业务重点及客户反馈更新内容，修正过时或不一致的信息。</td><td data-edit="annual_stage4_output">信息更新记录、重点业务内容、专项观察与阶段复盘。</td></tr>
+<tr data-period-stage="5"><td><strong data-stage-label>第10—12个月</strong><small>汇总与规划</small></td><td data-edit="annual_stage5_work">维护核心信息，汇总全年覆盖变化、遗留问题及可核实的业务反馈。</td><td data-edit="annual_stage5_output">年度执行汇总、监测变化、知识资产清单与后续建议。</td></tr>
 </tbody></table>
 <div class="section annual-monthly"><div class="section-title"><span>03.1</span><h3>每月固定的服务循环与交付</h3></div>
 <p class="annual-cycle" data-edit="w5">工作：按月安排内容与发布，每周反馈进展；结合监测、客户反馈和业务变化，调整内容重点并更新过时信息。</p>
@@ -253,8 +253,9 @@ body.client>.report-print .page{margin-bottom:20px}
 <dialog id="new-dialog" data-app-ui aria-labelledby="new-dialog-title"><form method="dialog"><div class="dialog-head"><h2 id="new-dialog-title">新建客户方案</h2><button aria-label="关闭">关闭</button></div><label>客户 / 方案名称<input id="new-name" maxlength="120" placeholder="填写本次服务的客户名称"></label><input id="new-template" type="hidden" value="generic"><p class="small">从通用模板开始，独立保存本次方案。也可以从“更多操作”复制已有方案。</p><button type="button" id="create-plan" class="primary">创建并填写资料</button></form></dialog>
 <dialog id="history-dialog" data-app-ui aria-labelledby="history-dialog-title"><div class="dialog-head"><h2 id="history-dialog-title">历史版本</h2><button id="close-history">关闭</button></div><p class="small">当前稿会自动保存。可通过“更多操作 → 保存一个版本”留存节点，最多保留最近30个版本。</p><div id="history-list"></div><section id="version-preview" hidden><h3 id="version-title"></h3><p id="version-summary"></p><button id="restore-version" class="primary">恢复这个版本</button></section></dialog>
 <script type="application/json" id="saved-state">{}</script>
-<script src="assets/print-layout.js?v=20261110-quote"></script>
-<script src="assets/report.js?v=20261110-quote"></script>
-<script src="assets/workspace.js?v=20261110-quote"></script>
-<script src="assets/interface.js?v=20261110-quote"></script>
+<script src="assets/plan-schema.js?v=20261112-full-plan"></script>
+<script src="assets/print-layout.js?v=20261112-full-plan"></script>
+<script src="assets/report.js?v=20261112-full-plan"></script>
+<script src="assets/workspace.js?v=20261112-full-plan"></script>
+<script src="assets/interface.js?v=20261112-full-plan"></script>
 </body></html>

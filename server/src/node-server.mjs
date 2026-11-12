@@ -29,6 +29,6 @@ const server=createServer(async (incoming,outgoing)=>{
     outgoing.end(JSON.stringify({error:{code:'INTERNAL_ERROR',message:'生成服务暂时出现异常，请稍后重试。'}}));
   }
 });
-server.requestTimeout=60000;
+server.requestTimeout=75000;
 server.headersTimeout=15000;
 server.listen(port,host,()=>process.stdout.write('GEO assistant service started.\n'));

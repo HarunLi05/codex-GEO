@@ -4,37 +4,47 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src https: http://localhost:* http://127.0.0.1:*; img-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
-<title>方案内容助手 · GEO 方案工作台</title>
-<link rel="stylesheet" href="assets/assistant.css?v=20261105-assistant">
+<title>全方案内容助手 · GEO 方案工作台</title>
+<link rel="stylesheet" href="assets/assistant.css?v=20261112-full-plan">
 </head>
 <body>
 <header class="topbar"><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">壹</span><span>GEO 方案工作台</span></a><a class="return-link" href="index.html">返回方案工作台 ↗</a></header>
 <main class="assistant-shell">
-<div class="page-heading"><p class="eyebrow">方案内容助手</p><h1>先生成初稿，再逐项核对</h1><p>集中提供企业资料与推广方向，生成对应字段的内容建议。检查、修改后，逐项复制到工作台。</p></div>
+<div class="page-heading"><p class="eyebrow">全方案内容助手</p><h1>从客户资料，整理出整份方案初稿</h1><p>按客户目标、服务报价、全期排期和执行说明分区生成。逐项核对、修改后，再复制到工作台。</p></div>
 <section class="connection-panel" aria-label="生成服务连接">
 <div class="connection-summary"><div><strong id="connection-status" role="status" aria-live="polite">尚未连接生成服务</strong><p id="connection-description">连接服务后可选择 DeepSeek 或 Gemini。模型 API 密钥由服务端保管。</p></div><button id="open-settings" type="button">连接设置</button></div>
 <details id="service-settings"><summary>连接生成服务</summary><form id="connection-form" novalidate><div class="settings-grid"><label>生成服务地址<input id="service-url" type="url" autocomplete="off" spellcheck="false" placeholder="填写已部署的 HTTPS 生成服务地址" required><span class="field-help">这里只会记住服务地址，不会保存访问口令。</span></label><label>服务访问口令<input id="service-passcode" type="password" autocomplete="off" placeholder="填写生成服务的访问口令" required><span class="field-help">不是 DeepSeek 或 Gemini 的 API 密钥；口令仅在本页面内存中使用。</span></label></div><div class="settings-actions"><button id="connect-service" class="primary" type="submit">连接并检查</button><button id="disconnect-service" type="button" hidden>断开连接</button><span id="settings-status" role="status" aria-live="polite"></span></div></form></details>
 </section>
 <div id="assistant-error" class="message error-message" role="alert" hidden></div>
 <div class="assistant-layout">
-<section class="input-panel panel" aria-labelledby="input-title"><div class="panel-heading"><span class="section-number">01</span><div><h2 id="input-title">提供本次客户资料</h2><p>已有资料可直接粘贴。没有提供的资质、案例和功效依据，不应由 AI 补造。</p></div></div>
-<form id="generation-form" novalidate>
-<label>企业基础资料 <span class="required">必填</span><textarea id="company-info" name="companyInfo" rows="10" maxlength="6000" placeholder="填写企业或品牌名称、主营业务、产品特点、目标客群、服务区域及已有的资质或案例资料。只填写真实、可使用的信息。" required></textarea><span class="field-help field-meta"><span>如涉及人物履历、产品参数或资质，请写明已有依据。</span><span id="company-count">0 / 6000</span></span></label>
-<label>本次推广方向 <span class="required">必填</span><textarea id="promotion-direction" name="promotionDirection" rows="5" maxlength="2000" placeholder="填写本次重点推广什么、希望影响谁、解决什么认知问题，以及希望承接咨询、询价、演示或购买等哪类行动。" required></textarea><span class="field-help field-meta"><span>可以描述实际想法，不需要先整理成方案文案。</span><span id="direction-count">0 / 2000</span></span></label>
-<details class="optional-input"><summary>补充约束与核对要求（选填）</summary><label><span class="sr-only">补充约束与核对要求</span><textarea id="generation-constraints" name="constraints" rows="4" maxlength="1000" placeholder="填写不能使用的表述、需要客户核实的事项、采购周期或行业特殊要求。"></textarea><span class="field-help field-meta"><span>这些要求会一并交给所选模型。</span><span id="constraints-count">0 / 1000</span></span></label></details>
+<section class="input-panel panel" aria-labelledby="input-title"><div class="panel-heading"><span class="section-number">01</span><div><h2 id="input-title">提供资料与已确认配置</h2><p>客户事实与服务约定分别填写。未知的信息留空，AI 不应补造资质、报价或交付数量。</p></div></div>
+<form id="generation-form" novalidate autocomplete="off">
+<label>企业基础资料 <span class="required">必填</span><textarea id="company-info" name="companyInfo" rows="7" maxlength="6000" placeholder="填写企业或品牌名称、主营业务、产品特点、目标客群、服务区域及已有的资质或案例资料。只填写真实、可使用的信息。" required></textarea><span class="field-help field-meta"><span>人物履历、参数和资质请写明已有依据。</span><span id="company-count">0 / 6000</span></span></label>
+<label>本次推广方向 <span class="required">必填</span><textarea id="promotion-direction" name="promotionDirection" rows="4" maxlength="2000" placeholder="填写重点推广什么、希望影响谁、解决什么问题，以及希望承接咨询、询价、演示或购买等哪类行动。" required></textarea><span class="field-help field-meta"><span>直接描述实际想法即可。</span><span id="direction-count">0 / 2000</span></span></label>
+<details class="service-facts" id="service-facts" open><summary>已确认的服务配置</summary><p class="section-help">金额、周期、平台和数量只按这里提供的事实整理。尚未确认的内容请留空，不会由 AI 自行定价、计算折扣或补足数量。</p>
+<div class="facts-grid"><label>服务方<input id="fact-provider" name="serviceProvider" type="text" maxlength="120" value="壹站推"></label><label>方案日期<input id="fact-date" name="date" type="date"></label><label>服务周期 · 月<input id="fact-duration-months" name="durationMonths" type="number" min="1" max="120" step="1" placeholder="未确认可留空"></label><label>已确认的 AI 平台<textarea id="fact-platforms" name="platforms" rows="2" maxlength="1000" placeholder="未确认可留空"></textarea></label></div>
+<label>已确认服务范围<textarea id="fact-scope" name="scope" rows="4" maxlength="6000" placeholder="填写已约定的服务项目、执行范围与限制。未知留空。"></textarea></label>
+<label>已确认报价<textarea id="fact-fee" name="fee" rows="3" maxlength="2000" placeholder="可分行填写报价、付款条件和已明确的优惠。没有确认价格时留空。"></textarea><span class="field-help">原样保留已确认价格，不自动编价或计算折扣。</span></label>
+<label>数量与加赠配置<textarea id="fact-resources" name="resources" rows="4" maxlength="4000" placeholder="填写约定的执行数量、系统额度、加赠资源及计量方式。未知留空。"></textarea></label>
+<label>上方数量的计量口径<select id="fact-resource-type" name="resourceType"><option value="unspecified">尚未确认计量口径</option><option value="execution_quota">系统执行资源额度</option><option value="deliverables">已确认的成品交付数量</option></select><span class="field-help" id="resource-type-help">系统额度不等于同量确认稿件、确认成片或发布交付；只有双方确认的成品数量才能写成交付承诺。</span></label>
+</details>
+<details class="optional-input"><summary>补充约束与核对要求（选填）</summary><label><span class="sr-only">补充约束与核对要求</span><textarea id="generation-constraints" name="constraints" rows="4" maxlength="1000" placeholder="填写不能使用的表述、客户审核要求、采购周期或行业特殊限制。"></textarea><span class="field-help field-meta"><span>这些要求会一并交给所选模型。</span><span id="constraints-count">0 / 1000</span></span></label></details>
 <div class="provider-row"><label>生成模型<select id="assistant-provider" name="provider"><option value="deepseek">DeepSeek</option><option value="gemini">Gemini</option></select></label><p id="model-description">连接后显示可用模型。</p></div>
-<p class="sending-notice" id="sending-notice">点击生成时，这里的资料会发送给你选择的 AI 服务；结果不会自动填入或保存到方案。</p>
-<div class="generation-actions"><button id="generate-content" class="primary" type="submit">生成内容建议</button><button id="cancel-generation" type="button" hidden>取消生成</button></div><p id="generation-status" class="generation-status" role="status" aria-live="polite">请先连接生成服务，再填写资料生成。</p>
+<p class="sending-notice" id="sending-notice">点击生成时，这里的客户资料与服务配置会发送给你选择的 AI 服务。整份方案按四个区域依次生成；结果不会自动填入或保存到方案。</p>
+<div class="generation-actions"><button id="generate-content" class="primary" type="submit">生成整份方案</button><button id="cancel-generation" type="button" hidden>取消生成</button></div><p id="generation-status" class="generation-status" role="status" aria-live="polite">请先连接生成服务，再填写资料生成。</p>
+<ol id="generation-progress" class="generation-progress" aria-label="四个区域的生成进度"></ol>
 </form>
 </section>
-<section class="result-panel panel" aria-labelledby="results-title"><div class="panel-heading result-heading"><span class="section-number">02</span><div><h2 id="results-title">核对后，逐项复制</h2><p>每一项对应工作台中的一个输入框，内容可以直接修改。</p></div><button id="clear-results" type="button" hidden>清空结果</button></div>
-<div id="results-empty" class="results-empty"><span class="empty-symbol" aria-hidden="true">≡</span><h3>生成结果会显示在这里</h3><p>不会自动覆盖工作台中的客户资料。请核实业务事实和表述，再复制到对应字段。</p><div class="empty-guide"><span>提供资料</span><span aria-hidden="true">→</span><span>生成初稿</span><span aria-hidden="true">→</span><span>核对并复制</span></div></div>
-<div id="result-metadata" class="result-metadata" hidden><strong id="result-client"></strong><p id="result-origin"></p><p id="result-state" role="status" aria-live="polite"></p></div>
-<div id="result-cards" class="result-cards"></div>
-<p class="result-retention">生成结果仅保留在当前页面。刷新或关闭前，请复制需要的内容；本页不会读取或修改工作台的方案库。</p>
+<section class="result-panel panel" aria-labelledby="results-title"><div class="panel-heading result-heading"><span class="section-number">02</span><div><h2 id="results-title">按区域核对与复制</h2><p>保留标准结构，逐项核实本次客户的业务事实与服务约定。</p></div><button id="clear-results" type="button" hidden>清空结果</button></div>
+<div class="result-overview"><strong id="result-summary">已生成 0 / 4 区</strong><span id="result-overview-state">按区域查看，不需要一次核对所有字段。</span></div>
+<div id="result-tabs" class="result-tabs" role="tablist" aria-label="方案内容区域"></div>
+<div id="result-sections"></div>
+<details id="config-export" class="config-export"><summary>复制或导出 JSON 配置</summary><p id="config-status" class="section-help" role="status" aria-live="polite">尚无生成结果。配置只包含已生成区域的当前编辑内容，不会自动应用到工作台。</p><div class="export-actions"><button id="copy-config" type="button" disabled>复制 JSON 配置</button><button id="download-config" type="button" disabled>导出 JSON 文件</button></div><label><span class="sr-only">当前 JSON 配置</span><textarea id="config-output" rows="8" readonly spellcheck="false" placeholder="生成后可在此核对 JSON 配置"></textarea></label><p id="config-copy-status" class="copy-status" role="status" aria-live="polite"></p></details>
+<p class="result-retention">资料、口令与生成结果仅保留在当前页面内存。刷新或关闭前，请复制需要的内容；本页不会读取或修改工作台的方案库。</p>
 </section>
 </div>
 </main>
-<script src="assets/assistant.js?v=20261105-assistant"></script>
+<script src="assets/plan-schema.js?v=20261112-full-plan"></script>
+<script src="assets/assistant.js?v=20261112-full-plan"></script>
 </body>
 </html>

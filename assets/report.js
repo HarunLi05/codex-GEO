@@ -63,6 +63,7 @@ function render() {
     const fallback={client:'客户企业',audience:'待启动阶段共同确认',business:'待填写本次主推业务',evidence:'待启动阶段核实资料与优势',actions:'待双方确认承接方式'};
     el.textContent = state[key] || fallback[key] || '';
   });
+  renderReportPeriods();
   renderBusinessFocus();
   syncPresets();
   const questions = document.getElementById('questions'); questions.replaceChildren();
@@ -72,6 +73,23 @@ function render() {
   (lines.length ? lines : ['启动阶段共同确认拟观察的问题。']).forEach(text => {const li=document.createElement('li');li.textContent=text;questions.append(li);});
   document.getElementById('fee-row').classList.toggle('hidden', !String(state.fee || '').trim());
   document.dispatchEvent(new Event('geo:report-change'));
+}
+function renderReportPeriods() {
+  const periods=window.GEOPlanSchema.parseDuration(state.duration);
+  document.querySelectorAll('#document [data-period-stage]').forEach(row=>{
+    const stage=periods.stages[Number(row.dataset.periodStage)-1];
+    row.hidden=!stage.active;
+    row.querySelector('[data-stage-label]').textContent=stage.label;
+  });
+  document.querySelectorAll('.copy-section[data-period-stage]').forEach(section=>{
+    const stage=periods.stages[Number(section.dataset.periodStage)-1];
+    section.hidden=!stage.active;
+    section.querySelector('.copy-section-title').textContent=stage.label;
+  });
+  const lead=document.querySelector('[data-period-lead]');
+  if(lead)lead.textContent=periods.known?'本次服务期为'+periods.months+'个月。按阶段推进资料、内容与公开信息建设，按月执行、留档、观察与调整。':'以下为阶段安排参考，实际服务周期待双方确认；按月执行、留档、观察与调整。';
+  const help=document.getElementById('annual-period-help');
+  if(help)help.textContent=periods.known?'当前按'+periods.months+'个月安排阶段工作，每月持续执行并留存记录。各阶段重点、数量与频次按服务清单确认。':'当前为阶段安排参考。填写服务周期后自动调整阶段范围，实际数量与频次按服务清单确认。';
 }
 function copyPrefix(key) {
   if (/^w[1-5]$/.test(key)) return '工作：';
@@ -202,7 +220,7 @@ function copySection(container, title, subtitle, entries, open=false) {
   if(subtitle){const sub=document.createElement('small');sub.textContent=subtitle;summary.append(sub);}
   const fields=document.createElement('div');fields.className='copy-fields';
   for(const [key,label] of entries)fields.append(copyEditor(key,label));
-  detail.append(summary,fields);container.append(detail);
+  detail.append(summary,fields);container.append(detail);return detail;
 }
 function buildCopyEditors() {
   document.getElementById('goals-editor').append(copyEditor('goals','本次服务希望推动的方向（选填调整）','留空时沿用标准服务目标；填写后替换，清空后恢复标准目标。'));
@@ -212,7 +230,7 @@ function buildCopyEditors() {
   copySection(schedule,'排期说明','服务起算与调整条件',[['timing','对客说明']]);
   const annual=document.getElementById('annual-editors');
   const annualTitles=[['第1个月','建立基础与观察起点'],['第2—3个月','验证方向并补齐核心问题'],['第4—6个月','扩展产品与客户场景'],['第7—9个月','跟随业务变化深化运营'],['第10—12个月','整理成果与后续重点']];
-  annualTitles.forEach(([title,subtitle],i)=>copySection(annual,title,subtitle,[['annual_stage'+(i+1)+'_work','阶段工作重点'],['annual_stage'+(i+1)+'_output','阶段交付']],i===1));
+  annualTitles.forEach(([title,subtitle],i)=>{const detail=copySection(annual,title,subtitle,[['annual_stage'+(i+1)+'_work','阶段工作重点'],['annual_stage'+(i+1)+'_output','阶段交付']],i===1);detail.dataset.periodStage=String(i+1);});
   copySection(annual,'每月固定交付','每个月执行、留档、复测与调整',[['monthly_plan','月度执行计划'],['monthly_content','内容与发布台账'],['monthly_monitor','监测与问题记录'],['monthly_review','月度复盘与下月安排']],true);
   copySection(annual,'持续运营与期满总结','兼容原有方案的运营与总结安排',[['w5','持续运营工作'],['d5','持续运营交付'],['w6','期满总结与建议'],['annual_note','年度排期与范围说明']]);
   const content=document.getElementById('content-editors');

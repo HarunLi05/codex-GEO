@@ -32,9 +32,9 @@ test('Workers module entry exports a fetch handler and only supported function b
 });
 test('service fails closed without access token and authenticates metadata',async()=>{
   const worker=createWorker({fetcher:noNetwork});
-  let response=await worker.fetch(request('/config',null),{});assert.equal(response.status,503);
+  let response=await worker.fetch(request('/config',null),{});assert.equal(response.status,503);assert.equal(response.headers.get('X-GEO-Plan-Version'),'2');
   response=await worker.fetch(request('/config',null),{...env,ASSISTANT_ACCESS_TOKEN:'too-short'});assert.equal(response.status,503);
-  response=await worker.fetch(request('/config',null,{headers:{Origin:origin}}),env);assert.equal(response.status,401);
+  response=await worker.fetch(request('/config',null,{headers:{Origin:origin}}),env);assert.equal(response.status,401);assert.equal(response.headers.get('X-GEO-Plan-Version'),'2');assert(!await response.text().then(text=>text.includes('configured')));
   response=await worker.fetch(request('/config',null),env);assert.equal(response.status,200);
   const body=await response.text();assert(!body.includes(TOKEN));assert(!body.includes('unit-deepseek-key'));
   const config=JSON.parse(body);assert.equal(config.providers.length,2);
@@ -106,11 +106,11 @@ test('invalid input, model names, huge bodies and forged provider types fail saf
     assert.equal((await worker.fetch(request('/generate',body),env)).status,400);
   }
   assert.equal((await worker.fetch(request('/generate','{broken'),env)).status,400);
-  assert.equal((await worker.fetch(request('/generate','x'.repeat(66000)),env)).status,413);
+  assert.equal((await worker.fetch(request('/generate','x'.repeat(98305)),env)).status,413);
   assert.equal((await worker.fetch(request('/config',null),{...env,GEMINI_MODEL:'../../malicious?key=secret'})).status,503);
 });
 test('a streamed body cannot bypass the byte limit by omitting Content-Length',async()=>{
-  const stream=new ReadableStream({start(controller){controller.enqueue(new Uint8Array(65537));controller.close();}});
+  const stream=new ReadableStream({start(controller){controller.enqueue(new Uint8Array(98305));controller.close();}});
   const req=new Request('https://assistant.example/generate',{method:'POST',headers:{Authorization:'Bearer '+TOKEN,'Content-Type':'application/json'},body:stream,duplex:'half'});
   const response=await createWorker({fetcher:noNetwork}).fetch(req,env);assert.equal(response.status,413);
 });
