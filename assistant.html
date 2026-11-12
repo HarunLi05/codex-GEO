@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src https: http://localhost:* http://127.0.0.1:*; img-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
 <title>全方案内容助手 · GEO 方案工作台</title>
-<link rel="stylesheet" href="assets/assistant.css?v=20261112-full-plan">
+<link rel="stylesheet" href="assets/assistant.css?v=20261112-remember">
 </head>
 <body>
 <header class="topbar"><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">壹</span><span>GEO 方案工作台</span></a><a class="return-link" href="index.html">返回方案工作台 ↗</a></header>
@@ -13,7 +13,7 @@
 <div class="page-heading"><p class="eyebrow">全方案内容助手</p><h1>从客户资料，整理出整份方案初稿</h1><p>按客户目标、服务报价、全期排期和执行说明分区生成。逐项核对、修改后，再复制到工作台。</p></div>
 <section class="connection-panel" aria-label="生成服务连接">
 <div class="connection-summary"><div><strong id="connection-status" role="status" aria-live="polite">尚未连接生成服务</strong><p id="connection-description">连接服务后可选择 DeepSeek 或 Gemini。模型 API 密钥由服务端保管。</p></div><button id="open-settings" type="button">连接设置</button></div>
-<details id="service-settings"><summary>连接生成服务</summary><form id="connection-form" novalidate><div class="settings-grid"><label>生成服务地址<input id="service-url" type="url" autocomplete="off" spellcheck="false" placeholder="填写已部署的 HTTPS 生成服务地址" required><span class="field-help">这里只会记住服务地址，不会保存访问口令。</span></label><label>服务访问口令<input id="service-passcode" type="password" autocomplete="off" placeholder="填写生成服务的访问口令" required><span class="field-help">不是 DeepSeek 或 Gemini 的 API 密钥；口令仅在本页面内存中使用。</span></label></div><div class="settings-actions"><button id="connect-service" class="primary" type="submit">连接并检查</button><button id="disconnect-service" type="button" hidden>断开连接</button><span id="settings-status" role="status" aria-live="polite"></span></div></form></details>
+<details id="service-settings"><summary>连接生成服务</summary><form id="connection-form" novalidate><div class="settings-grid"><label>生成服务地址<input id="service-url" type="url" autocomplete="off" spellcheck="false" placeholder="填写已部署的 HTTPS 生成服务地址" required><span class="field-help">服务地址会记住；勾选下方选项后，也会记住访问口令。</span></label><label>服务访问口令<input id="service-passcode" type="password" autocomplete="off" placeholder="填写生成服务的访问口令" required><span class="field-help">填写独立服务口令，不是 DeepSeek 或 Gemini 的 API 密钥。</span></label></div><label class="remember-option"><input id="remember-connection" type="checkbox"><span>在此浏览器记住连接</span></label><p class="field-help remember-help">勾选后保存服务地址和访问口令，下次打开自动连接；适用于你自己的电脑。</p><p id="remember-status" class="field-help" role="status" aria-live="polite">未记住访问口令，刷新或关闭后需重新填写。</p><div class="settings-actions"><button id="connect-service" class="primary" type="submit">连接并检查</button><button id="disconnect-service" type="button" hidden>断开连接</button><button id="forget-connection" type="button">清除已记住的连接</button><span id="settings-status" role="status" aria-live="polite"></span></div></form></details>
 </section>
 <div id="assistant-error" class="message error-message" role="alert" hidden></div>
 <div class="assistant-layout">
@@ -40,11 +40,11 @@
 <div id="result-tabs" class="result-tabs" role="tablist" aria-label="方案内容区域"></div>
 <div id="result-sections"></div>
 <details id="config-export" class="config-export"><summary>复制或导出 JSON 配置</summary><p id="config-status" class="section-help" role="status" aria-live="polite">尚无生成结果。配置只包含已生成区域的当前编辑内容，不会自动应用到工作台。</p><div class="export-actions"><button id="copy-config" type="button" disabled>复制 JSON 配置</button><button id="download-config" type="button" disabled>导出 JSON 文件</button></div><label><span class="sr-only">当前 JSON 配置</span><textarea id="config-output" rows="8" readonly spellcheck="false" placeholder="生成后可在此核对 JSON 配置"></textarea></label><p id="config-copy-status" class="copy-status" role="status" aria-live="polite"></p></details>
-<p class="result-retention">资料、口令与生成结果仅保留在当前页面内存。刷新或关闭前，请复制需要的内容；本页不会读取或修改工作台的方案库。</p>
+<p class="result-retention">客户资料、服务配置与生成结果仅保留在当前页面内存。访问口令仅在主动勾选后保存在此浏览器；可随时清除。刷新或关闭前，请复制需要的内容；本页不会读取或修改工作台的方案库。</p>
 </section>
 </div>
 </main>
-<script src="assets/plan-schema.js?v=20261112-full-plan"></script>
-<script src="assets/assistant.js?v=20261112-full-plan"></script>
+<script src="assets/plan-schema.js?v=20261112-remember"></script>
+<script src="assets/assistant.js?v=20261112-remember"></script>
 </body>
 </html>

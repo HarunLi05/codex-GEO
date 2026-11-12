@@ -4,12 +4,13 @@
   const schema=globalThis.GEOPlanSchema;
   if(!schema){$('assistant-error').textContent='方案字段配置未能加载，请刷新页面后重试。';$('assistant-error').hidden=false;return;}
   const ENDPOINT_KEY='yizhantui.geo.assistant.endpoint.v1';
+  const CONNECTION_KEY='yizhantui.geo.assistant.connection.v1';
   const PROVIDERS={deepseek:'DeepSeek',gemini:'Gemini'};
   const INPUTS={companyInfo:$('company-info'),promotionDirection:$('promotion-direction'),constraints:$('generation-constraints')};
   const UI_LIMITS={companyInfo:6000,promotionDirection:2000,constraints:1000};
   const FACTS={provider:$('fact-provider'),date:$('fact-date'),durationMonths:$('fact-duration-months'),platforms:$('fact-platforms'),scope:$('fact-scope'),fee:$('fact-fee'),resources:$('fact-resources'),resourceType:$('fact-resource-type')};
   const FACT_LIMITS={provider:120,platforms:1000,scope:6000,fee:2000,resources:4000};
-  const state={connection:null,busy:false,task:null,active:'profile',records:new Map(),cards:new Map(),progress:new Map()};
+  const state={connection:null,remembered:null,credentialEndpoint:'',busy:false,task:null,active:'profile',records:new Map(),cards:new Map(),progress:new Map()};
   const ui=new Map();
   const text=(tag,className,value)=>{const node=document.createElement(tag);if(className)node.className=className;if(value!==undefined)node.textContent=value;return node;};
   const notify=value=>{$('generation-status').textContent=value;};
@@ -33,6 +34,39 @@
     if(url.protocol!=='https:'&&!local)throw new Error('生成服务需使用 HTTPS；本地开发仅支持 localhost 或 127.0.0.1。');
     if(url.username||url.password||url.search||url.hash)throw new Error('服务地址不能包含账号、密码、查询参数或片段。');
     return url.href.replace(/\/+$/,'');
+  }
+  function removeRemembered(){
+    state.remembered=null;
+    try{localStorage.removeItem(CONNECTION_KEY);return true;}
+    catch(e){$('remember-status').textContent='本页已断开记忆，但浏览器未允许删除保存的连接；请检查站点存储权限。';return false;}
+  }
+  function rememberVerifiedConnection(){
+    if(!$('remember-connection').checked||!state.connection)return false;
+    const saved={version:1,endpoint:state.connection.endpoint,token:state.connection.token};
+    try{localStorage.setItem(ENDPOINT_KEY,saved.endpoint);localStorage.setItem(CONNECTION_KEY,JSON.stringify(saved));state.remembered=saved;$('remember-status').textContent='已在此浏览器记住连接，下次打开会自动检查连接。';return true;}
+    catch(e){state.remembered=null;$('remember-connection').checked=false;try{localStorage.removeItem(CONNECTION_KEY);}catch(ignore){}$('remember-status').textContent='已连接，但浏览器无法保存访问口令；下次仍需填写。';return false;}
+  }
+  function expireRememberedConnection(){
+    const removed=removeRemembered();$('remember-connection').checked=false;$('service-passcode').value='';state.credentialEndpoint='';
+    if(removed)$('remember-status').textContent='已记住的访问口令不正确或已失效，请重新填写并连接。';
+  }
+  function restoreRememberedConnection(){
+    let endpointInvalid=false;
+    try{const endpoint=localStorage.getItem(ENDPOINT_KEY);if(endpoint){try{$('service-url').value=validateEndpoint(endpoint);}catch(e){endpointInvalid=true;}}}
+    catch(e){$('remember-status').textContent='浏览器存储不可用，当前连接只会保留在本页面。';return false;}
+    let raw;
+    try{raw=localStorage.getItem(CONNECTION_KEY);}catch(e){return false;}
+    if(!raw)return false;
+    try{
+      if(raw.length>16000)throw new Error('invalid saved connection');
+      const saved=JSON.parse(raw);
+      if(!saved||typeof saved!=='object'||Array.isArray(saved)||Object.keys(saved).sort().join(',')!=='endpoint,token,version'||saved.version!==1||typeof saved.endpoint!=='string'||typeof saved.token!=='string'||saved.token.trim().length<16||saved.token.length>4096||/[\r\n]/u.test(saved.token))throw new Error('invalid saved connection');
+      const endpoint=validateEndpoint(saved.endpoint);
+      if(endpointInvalid||($('service-url').value&&$('service-url').value!==endpoint))throw new Error('saved endpoint mismatch');
+      state.remembered={version:1,endpoint,token:saved.token.trim()};state.credentialEndpoint=endpoint;
+      $('service-url').value=endpoint;$('service-passcode').value=state.remembered.token;$('remember-connection').checked=true;
+      $('remember-status').textContent='正在使用此浏览器记住的连接检查服务…';return true;
+    }catch(e){if(removeRemembered())$('remember-status').textContent='保存的连接信息不可用，请重新填写并连接。';return false;}
   }
   function serverMessage(code,status){
     const messages={
@@ -95,7 +129,7 @@
   function updateControls(){
     const unavailable=state.connection&&!state.connection.providers.some(p=>p.configured);
     for(const input of [...Object.values(INPUTS),...Object.values(FACTS)])input.disabled=state.busy;
-    for(const id of ['assistant-provider','service-url','service-passcode','connect-service','disconnect-service','clear-results'])$(id).disabled=state.busy;
+    for(const id of ['assistant-provider','service-url','service-passcode','connect-service','disconnect-service','clear-results','remember-connection'])$(id).disabled=state.busy;
     $('generate-content').disabled=state.busy||Boolean(unavailable);
     for(const sectionUI of ui.values())sectionUI.generate.disabled=state.busy||Boolean(unavailable);
     for(const {input,copy} of state.cards.values()){input.disabled=state.busy;copy.disabled=state.busy;}
@@ -117,23 +151,25 @@
     const selected=state.connection?.providers.find(p=>p.id===$('assistant-provider').value);
     $('model-description').textContent=selected?(selected.configured?'模型：'+selected.model:'该模型尚未配置。'):'连接后显示可用模型。';updateAll();
   }
-  async function connect(event){
-    event.preventDefault();if(state.busy)return;clearError();
+  async function connect(event,{automatic=false}={}){
+    event?.preventDefault();if(state.busy)return;clearError();
     let endpoint;try{endpoint=validateEndpoint($('service-url').value);}catch(e){showError(e.message);$('service-settings').open=true;$('service-url').focus();return;}
     const token=$('service-passcode').value.trim();if(!token){showError('请填写生成服务的访问口令。');$('service-settings').open=true;$('service-passcode').focus();return;}
-    const task=beginTask('connect');$('settings-status').textContent='正在检查服务版本与可用模型…';
+    state.credentialEndpoint=endpoint;
+    const task=beginTask('connect');$('settings-status').textContent=automatic?'正在自动连接已记住的服务…':'正在检查服务版本与可用模型…';
     try{
       const config=parseConfig(await requestJSON(endpoint,'/config',token,{signal:task.controller.signal}));if(!isCurrent(task))return;
       state.connection={endpoint,token,...config};$('service-url').value=endpoint;try{localStorage.setItem(ENDPOINT_KEY,endpoint);}catch(e){}
+      if($('remember-connection').checked)rememberVerifiedConnection();else if(state.remembered)removeRemembered();
       for(const option of $('assistant-provider').options){const provider=config.providers.find(p=>p.id===option.value);option.disabled=!provider.configured;option.textContent=provider.label+(provider.configured?'':' · 未配置');}
       const current=config.providers.find(p=>p.id===$('assistant-provider').value);if(!current?.configured)$('assistant-provider').value=config.providers.find(p=>p.configured)?.id||'deepseek';
       for(const [key,input] of Object.entries(INPUTS)){const limit=Number(config.limits[key]);input.maxLength=Number.isInteger(limit)&&limit>0?Math.min(UI_LIMITS[key],limit):UI_LIMITS[key];}
       for(const [key,limit] of Object.entries(FACT_LIMITS)){const configured=Number(config.limits.serviceFacts?.[key]);FACTS[key].maxLength=Number.isInteger(configured)&&configured>0?Math.min(limit,configured):limit;}
       const enabled=config.providers.filter(p=>p.configured).map(p=>p.label);$('connection-status').textContent=enabled.length?'全方案生成服务已连接':'服务已连接，尚未配置模型';
-      $('connection-description').textContent=enabled.length?'可用模型：'+enabled.join('、')+'。支持四区全方案生成；访问口令只保留在本页面。':'请由管理员在服务端配置 DeepSeek 或 Gemini 的 API 密钥。';
+      $('connection-description').textContent=enabled.length?'可用模型：'+enabled.join('、')+'。支持四区全方案生成；'+(state.remembered?'此浏览器已记住连接。':'访问口令只保留在本页面。'):'请由管理员在服务端配置 DeepSeek 或 Gemini 的 API 密钥。';
       $('settings-status').textContent=enabled.length?'连接成功，可以开始生成。':'需要完成服务端模型配置。';$('disconnect-service').hidden=false;$('service-settings').open=!enabled.length;
       updateModelDescription();notify(enabled.length?'已连接。填写资料与服务配置后，可生成整份方案或仅生成一个区域。':'服务中尚无可用模型，请先完成服务端配置。');
-    }catch(e){if(!isCurrent(task))return;resetConnection();$('settings-status').textContent='连接未成功。';if(e.name!=='AbortError')showError(e.message);$('service-settings').open=true;}
+    }catch(e){if(!isCurrent(task))return;if(e.status===401)expireRememberedConnection();resetConnection();$('settings-status').textContent=automatic?'自动连接未成功，可在此重新连接。':'连接未成功。';if(e.name!=='AbortError')showError(e.message);$('service-settings').open=true;}
     finally{finishTask(task);}
   }
   function activateSection(id,focus=false){
@@ -255,7 +291,7 @@
       }catch(e){
         if(!isCurrent(task))return;failed++;state.progress.set(id,'失败');const record=state.records.get(id);if(record)record.outcome='failed';
         showError(schema.getSection(id).label+'：'+e.message);
-        if(e.status===401||e.status===403){resetConnection({message:'连接授权需要重新确认'});$('service-settings').open=true;for(const next of ids.slice(index+1))state.progress.set(next,'未生成');break;}
+        if(e.status===401||e.status===403){if(e.status===401)expireRememberedConnection();resetConnection({message:'连接授权需要重新确认'});$('service-settings').open=true;for(const next of ids.slice(index+1))state.progress.set(next,'未生成');break;}
       }
       updateAll();
     }
@@ -273,13 +309,37 @@
   }
   $('connection-form').addEventListener('submit',connect);$('generation-form').addEventListener('submit',event=>{event.preventDefault();generateSections(schema.sections.map(section=>section.id));});
   $('open-settings').onclick=()=>{$('service-settings').open=!$('service-settings').open;if($('service-settings').open)$('service-url').focus();};
-  $('disconnect-service').onclick=()=>{if(state.busy)return;resetConnection({clearPasscode:true});$('settings-status').textContent='已断开，访问口令已清除。';notify('请重新连接服务后生成。');};
-  for(const id of ['service-url','service-passcode'])$(id).addEventListener('input',()=>{if(state.connection)resetConnection({message:'连接信息已修改，请重新检查'});});
+  $('disconnect-service').onclick=()=>{if(state.busy)return;const removed=removeRemembered();$('remember-connection').checked=false;state.credentialEndpoint='';resetConnection({clearPasscode:true});$('settings-status').textContent='已断开连接。';if(removed)$('remember-status').textContent='已忘记访问口令，服务地址仍保留；下次需重新填写口令。';notify('请重新连接服务后生成。');};
+  $('remember-connection').addEventListener('change',()=>{
+    if($('remember-connection').checked){if(state.connection)rememberVerifiedConnection();else $('remember-status').textContent='连接成功后，会在此浏览器记住服务地址和访问口令。';}
+    else if(removeRemembered())$('remember-status').textContent='已关闭记住连接；本次连接仍可使用，刷新后需重新填写口令。';
+    if(state.connection)$('connection-description').textContent='支持四区全方案生成；'+(state.remembered?'此浏览器已记住连接。':'访问口令只保留在本页面。');
+  });
+  $('forget-connection').onclick=()=>{
+    if(state.task)cancelTask();const removed=removeRemembered();let endpointRemoved=true;
+    try{localStorage.removeItem(ENDPOINT_KEY);}catch(e){endpointRemoved=false;}
+    $('remember-connection').checked=false;$('service-url').value='';state.credentialEndpoint='';resetConnection({clearPasscode:true});$('service-settings').open=true;
+    $('settings-status').textContent='本页已断开连接。';
+    $('remember-status').textContent=removed&&endpointRemoved?'已清除本浏览器保存的服务地址和访问口令。':'本页已断开，但浏览器未允许完整删除保存信息；请检查站点存储权限。';
+    notify('请填写服务地址和口令后重新连接。');
+  };
+  $('service-url').addEventListener('input',()=>{
+    let endpoint='';try{endpoint=validateEndpoint($('service-url').value);}catch(e){}
+    if(state.credentialEndpoint&&endpoint!==state.credentialEndpoint){$('service-passcode').value='';state.credentialEndpoint='';}
+    if(state.remembered&&endpoint!==state.remembered.endpoint){if(removeRemembered())$('remember-status').textContent='服务地址已修改，旧口令记忆已清除；请为新地址填写口令。';}
+    if(state.connection)resetConnection({message:'连接信息已修改，请重新检查'});
+  });
+  $('service-passcode').addEventListener('input',()=>{
+    if(state.remembered){if(removeRemembered())$('remember-status').textContent='口令已修改，重新连接成功后再保存。';}
+    try{state.credentialEndpoint=validateEndpoint($('service-url').value);}catch(e){state.credentialEndpoint='';}
+    if(state.connection)resetConnection({message:'连接信息已修改，请重新检查'});
+  });
   for(const input of [...Object.values(INPUTS),...Object.values(FACTS)])input.addEventListener('input',()=>{input.setCustomValidity('');$('config-copy-status').textContent='';updateAll();});
   $('assistant-provider').addEventListener('change',updateModelDescription);$('cancel-generation').onclick=cancelTask;
   $('clear-results').onclick=()=>{if(state.busy)return;state.records.clear();state.cards.clear();for(const section of schema.sections){ui.get(section.id).cards.replaceChildren();ui.get(section.id).empty.hidden=false;state.progress.set(section.id,'未生成');}$('config-copy-status').textContent='';notify('生成结果已清空，可重新生成。');updateAll();};
   $('copy-config').onclick=()=>{updateExport();if(!countCurrent())return;copyValue($('config-output').value,$('config-output'),$('config-copy-status'));};
   $('download-config').onclick=()=>{updateExport();const {included}=collectConfig();if(!included.length)return;const blob=new Blob([$('config-output').value],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='GEO方案配置_'+(included.length===4?'完整':'不完整')+'_'+today()+'.json';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);$('config-copy-status').textContent=included.length===4?'已导出完整配置，请核对后使用。':'已导出不完整配置；缺少的区域见上方说明。';};
-  try{const endpoint=localStorage.getItem(ENDPOINT_KEY);if(endpoint)$('service-url').value=validateEndpoint(endpoint);}catch(e){}
+  const autoConnect=restoreRememberedConnection();
   $('service-settings').open=!$('service-url').value;buildSections();updateAll();
+  if(autoConnect)connect(null,{automatic:true});
 })();
