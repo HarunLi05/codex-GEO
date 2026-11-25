@@ -118,7 +118,7 @@ body.client>.report-print .page{margin-bottom:20px}
 :is(#p6,[data-origin-page="p6"]) .quote-summary .quote-fee{background:#e8e8e8;border-top:1px solid #bdbdbd}
 :is(#p6,[data-origin-page="p6"]) .quote-summary .quote-fee dd{font-size:14px;font-weight:700;color:#222;line-height:1.65}
 </style>
-<link rel="stylesheet" href="assets/workspace.css?v=20261112-full-plan">
+<link rel="stylesheet" href="assets/workspace.css?v=20261125-json-import">
 </head>
 <body class="view-details">
 <header class="app-topbar" data-app-ui><a class="app-brand" href="#" id="home-link"><span class="brand-mark" aria-hidden="true">壹</span><span>GEO 方案工作台</span></a><div class="app-topbar-actions"><a class="assistant-entry" href="assistant.html" target="_blank" rel="noopener">AI 内容助手 ↗</a><span class="privacy-badge">报告仅存本机</span></div></header>
@@ -133,7 +133,14 @@ body.client>.report-print .page{margin-bottom:20px}
 <button class="sidebar-backdrop" id="sidebar-backdrop" data-app-ui aria-label="关闭方案列表" hidden></button>
 <div class="app-main">
 <section class="workbench" data-app-ui>
-<div class="workbench-heading"><div class="current-plan"><button id="toggle-library" class="mobile-only">我的方案</button><span class="workbench-kicker">当前方案</span><h1 id="current-plan-name">未命名客户方案</h1><span id="persist-status" role="status" aria-live="polite"></span></div><div class="plan-actions"><details class="more-menu" id="plan-menu"><summary>更多操作</summary><div class="menu-items"><button id="save">保存一个版本</button><button id="show-history">历史版本</button><button id="copy-plan">复制为新方案</button></div></details><button id="preview-shortcut" class="primary">预览与导出</button></div></div>
+<div class="workbench-heading">
+<div class="current-plan"><button id="toggle-library" class="mobile-only">我的方案</button><span class="workbench-kicker">当前方案</span><h1 id="current-plan-name">未命名客户方案</h1><span id="persist-status" role="status" aria-live="polite"></span></div>
+<div class="plan-actions">
+<button id="open-json-import" type="button" aria-haspopup="dialog" aria-controls="json-import-dialog">导入 JSON／一键填单</button>
+<details class="more-menu" id="plan-menu"><summary>更多操作</summary><div class="menu-items"><button id="save">保存一个版本</button><button id="show-history">历史版本</button><button id="copy-plan">复制为新方案</button></div></details>
+<button id="preview-shortcut" class="primary">预览与导出</button>
+</div>
+</div>
 <nav class="workflow" aria-label="方案制作步骤" role="tablist"><button id="step-details" data-view="details" role="tab" aria-controls="view-details" aria-selected="true"><span class="step-number">1</span><span><strong>客户资料</strong><small>明确业务与推广方向</small></span></button><button id="step-service" data-view="service" role="tab" aria-controls="view-service" aria-selected="false"><span class="step-number">2</span><span><strong>服务安排</strong><small>确认范围与阶段交付</small></span></button><button id="step-preview" data-view="preview" role="tab" aria-controls="view-preview" aria-selected="false"><span class="step-number">3</span><span><strong>预览与导出</strong><small>检查并交付客户版本</small></span></button></nav>
 <div id="storage-error" class="storage-error" role="alert" hidden></div>
 <div id="fields">
@@ -251,11 +258,28 @@ body.client>.report-print .page{margin-bottom:20px}
 </div></div>
 
 <dialog id="new-dialog" data-app-ui aria-labelledby="new-dialog-title"><form method="dialog"><div class="dialog-head"><h2 id="new-dialog-title">新建客户方案</h2><button aria-label="关闭">关闭</button></div><label>客户 / 方案名称<input id="new-name" maxlength="120" placeholder="填写本次服务的客户名称"></label><input id="new-template" type="hidden" value="generic"><p class="small">从通用模板开始，独立保存本次方案。也可以从“更多操作”复制已有方案。</p><button type="button" id="create-plan" class="primary">创建并填写资料</button></form></dialog>
+<dialog id="json-import-dialog" data-app-ui aria-labelledby="json-import-title" aria-describedby="json-import-help">
+<form method="dialog">
+<div class="dialog-head"><h2 id="json-import-title">导入 JSON／一键填单</h2><button id="close-json-import">关闭</button></div>
+<p id="json-import-help">粘贴或上传 AI 内容助手导出的 JSON。导入前可先核对内容。</p>
+<label for="json-import-text">粘贴 JSON</label>
+<textarea id="json-import-text" rows="7" spellcheck="false" autocapitalize="off" placeholder='{"fields":{"client":"示例客户"}}' autofocus></textarea>
+<label for="json-import-file">或上传 JSON 文件</label>
+<input id="json-import-file" type="file" accept="application/json,.json">
+<p id="json-import-status" role="status"></p>
+<p id="json-import-error" role="alert" hidden></p>
+<p class="json-import-destination">当前方案 <strong id="json-import-target"></strong>。填入时只更新 JSON 提供的字段，并保存导入前的版本。</p>
+<div class="json-import-actions">
+<button id="json-import-create" type="button">新建方案</button>
+<button id="json-import-apply" type="button" class="primary">填入当前方案</button>
+</div>
+</form>
+</dialog>
 <dialog id="history-dialog" data-app-ui aria-labelledby="history-dialog-title"><div class="dialog-head"><h2 id="history-dialog-title">历史版本</h2><button id="close-history">关闭</button></div><p class="small">当前稿会自动保存。可通过“更多操作 → 保存一个版本”留存节点，最多保留最近30个版本。</p><div id="history-list"></div><section id="version-preview" hidden><h3 id="version-title"></h3><p id="version-summary"></p><button id="restore-version" class="primary">恢复这个版本</button></section></dialog>
 <script type="application/json" id="saved-state">{}</script>
-<script src="assets/plan-schema.js?v=20261112-full-plan"></script>
+<script src="assets/plan-schema.js?v=20261125-json-import"></script>
 <script src="assets/print-layout.js?v=20261112-full-plan"></script>
 <script src="assets/report.js?v=20261112-full-plan"></script>
-<script src="assets/workspace.js?v=20261112-full-plan"></script>
+<script src="assets/workspace.js?v=20261125-json-import"></script>
 <script src="assets/interface.js?v=20261112-full-plan"></script>
 </body></html>

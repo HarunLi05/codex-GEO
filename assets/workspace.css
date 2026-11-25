@@ -174,3 +174,99 @@ dialog .primary{font-size:12px}
 .assistant-entry:hover{background:#f4f4f4;border-color:#aaa}
 .assistant-entry:focus-visible{outline:2px solid #666;outline-offset:3px}
 @media screen and (max-width:620px){.app-topbar-actions{gap:8px}.assistant-entry{font-size:11px;padding:5px 8px}.app-topbar-actions .privacy-badge{display:none}}
+
+#open-json-import {
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+#json-import-dialog {
+  max-height: 86dvh;
+  font-size: 14px;
+}
+
+#json-import-dialog .dialog-head {
+  margin-bottom: 10px;
+}
+
+#json-import-dialog label {
+  margin: 14px 0 5px;
+  color: #454545;
+  font-size: 14px;
+  font-weight: 550;
+}
+
+#json-import-text {
+  display: block;
+  margin: 0;
+  padding: 10px 12px;
+  font: 14px/1.6 ui-monospace, monospace;
+}
+
+#json-import-file {
+  margin: 0;
+  padding: 7px;
+}
+
+#json-import-file::file-selector-button {
+  margin-right: 8px;
+  padding: 4px 9px;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  background: #f5f5f5;
+  color: #333333;
+  cursor: pointer;
+}
+
+#json-import-status:empty {
+  margin: 0;
+}
+
+#json-import-status:not(:empty),
+#json-import-error {
+  margin: 10px 0 0;
+  overflow-wrap: anywhere;
+}
+
+#json-import-error {
+  color: #8d2c2c;
+}
+
+.json-import-destination {
+  margin: 18px 0 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--app-border);
+  overflow-wrap: anywhere;
+}
+
+.json-import-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#json-import-dialog .json-import-actions button {
+  font-size: 14px;
+}
+
+@media screen and (max-width: 620px) {
+  .workbench-heading {
+    display: block;
+  }
+
+  .workbench-heading .plan-actions {
+    flex-flow: row wrap;
+    gap: 6px;
+    margin-top: 11px;
+  }
+
+  [data-app-ui] #open-json-import {
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+
+  #json-import-text {
+    font-size: 16px;
+  }
+}

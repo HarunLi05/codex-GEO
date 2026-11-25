@@ -40,3 +40,35 @@ test('section validation rejects extra keys, missing fields and incomplete searc
   assert(!schema.validateSection({...result,fields:{...result.fields,questions:'重复问题？\n重复问题？'}},'profile'));
   assert(!schema.validateSection({...result,fields:{...result.fields,business:'【客户名称】'}},'profile'));
 });
+
+test('plan import accepts a complete assistant export and partial patches with empty text',()=>{
+  const result={fields:{},copy:{}};
+  for(const {path,label} of schema.allFields){
+    const [part,key]=path.split('.');
+    result[part][key]=label+'\n测试内容';
+  }
+  result.fields.fee='';
+  assert.deepEqual(schema.parsePlanImport('\ufeff'+JSON.stringify(result)),{patch:result,count:65,ignoredCount:0});
+  assert.deepEqual(schema.parsePlanImport('```JSON\r\n{"copy":{"goals":""}}\r\n```'),{
+    patch:{fields:{},copy:{goals:''}},count:1,ignoredCount:0
+  });
+});
+
+test('plan import discards unknown keys and preserves only the recognized paths',()=>{
+  const source='{"activeId":"irrelevant","fields":{"__proto__":{"polluted":"test"},"constructor":"test","client":"测试品牌"},"copy":{"unknown":"ignored"},"history":[]}';
+  assert.deepEqual(schema.parsePlanImport(source),{
+    patch:{fields:{client:'测试品牌'},copy:{}},count:1,ignoredCount:5
+  });
+});
+
+test('plan import rejects malformed documents and invalid values for known fields',()=>{
+  assert.throws(()=>schema.parsePlanImport(' '),/请粘贴/);
+  assert.throws(()=>schema.parsePlanImport('{"fields":'),/JSON 格式有误/);
+  for(const source of ['null','[]','"text"','1'])assert.throws(()=>schema.parsePlanImport(source),/JSON 对象/);
+  for(const source of ['{}','{"fields":{},"copy":{}}','{"metadata":42}'])assert.throws(()=>schema.parsePlanImport(source),/没有找到/);
+  assert.throws(()=>schema.parsePlanImport('{"fields":{"client":"测试品牌"},"copy":[]}'),/copy 必须是对象/);
+  for(const value of [null,42,false,[],{}]){
+    const source=JSON.stringify({fields:{client:'测试品牌',fee:value}});
+    assert.throws(()=>schema.parsePlanImport(source),/fields\.fee.*必须是字符串/);
+  }
+});

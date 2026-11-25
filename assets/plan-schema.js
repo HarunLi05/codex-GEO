@@ -18,8 +18,46 @@
       ...[['boundary','服务范围与效果说明'],['end','期满交付与后续建议'],['next','下一步安排']].map(([key,label])=>field('copy.'+key,label,'服务安排 → 工作说明 → 合作与总结'))]}
   ];
   const allFields=sections.flatMap(s=>s.fields);
+  const fieldsByPath=new Map(allFields.map(field=>[field.path,field]));
   const lockedPaths=['fields.provider','fields.date','fields.duration','fields.platforms','fields.scope','fields.fee'];
   const placeholder=/【[^】]+】|\$\{[^}]+\}|\{\{[^}]+\}\}|\[(?:客户|企业|品牌|产品|品类|地区|区域|名称|请填|待填)[^\]]*\]|[（(](?:客户名称|企业名称|品牌名称|产品名称|请填写|待填写|请替换)[^）)]*[）)]|(?:请替换|产品名称待填)/u;
+  const isObject=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+  function parsePlanImport(text) {
+    const source=text.trim();
+    if(!source)throw new Error('请粘贴 AI 内容助手导出的 JSON，或选择 JSON 文件。');
+    const fenced=source.match(/^```(?:json)?[^\S\r\n]*\r?\n([\s\S]*?)\r?\n```$/i);
+    let data;
+    try {
+      data=JSON.parse(fenced ? fenced[1].trim() : source);
+    } catch {
+      throw new Error('JSON 格式有误。请检查引号、逗号和括号，或重新从 AI 内容助手导出。');
+    }
+    if(!isObject(data))throw new Error('请导入包含 fields 或 copy 的 JSON 对象。');
+
+    const patch={fields:{},copy:{}};
+    let count=0;
+    let ignoredCount=0;
+    for(const [part,entries] of Object.entries(data)) {
+      if(part!=='fields'&&part!=='copy') {
+        ignoredCount++;
+        continue;
+      }
+      if(!isObject(entries))throw new Error('JSON 中的 '+part+' 必须是对象。');
+      for(const [key,value] of Object.entries(entries)) {
+        const path=part+'.'+key;
+        const field=fieldsByPath.get(path);
+        if(!field) {
+          ignoredCount++;
+          continue;
+        }
+        if(typeof value!=='string')throw new Error('“'+field.label+'”（'+path+'）必须是字符串。请在 JSON 中用双引号包住字段值。');
+        patch[part][key]=value;
+        count++;
+      }
+    }
+    if(!count)throw new Error('没有找到可导入的方案字段。请选择 AI 内容助手导出的 JSON。');
+    return {patch,count,ignoredCount};
+  }
   function getSection(id){return sections.find(s=>s.id===id);}
   function periodStages(months){
     const count=Number(months);const known=Number.isInteger(count)&&count>=1&&count<=120;
@@ -60,5 +98,5 @@
     }
     return true;
   }
-  return {sections,allFields,lockedPaths,getSection,periodStages,parseDuration,canonicalFields,validateSection};
+  return {sections,allFields,lockedPaths,getSection,periodStages,parseDuration,canonicalFields,validateSection,parsePlanImport};
 });

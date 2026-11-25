@@ -15,15 +15,15 @@
   const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   const error = message => { $('storage-error').hidden = false; $('storage-error').textContent = message; $('persist-status').textContent = '尚未保存'; };
   const clearError = () => { $('storage-error').hidden = true; };
-  function persist() {
+  function persist(candidate = store) {
     if (conflict) return false;
     try {
       // Check the disk revision again before every write; a second tab must never silently overwrite work.
       const disk = localStorage.getItem(KEY);
       if (disk && JSON.parse(disk).revision !== store.revision) { lock(); return false; }
-      const revision = id();
-      localStorage.setItem(KEY, JSON.stringify({...store, revision}));
-      store.revision = revision;
+      const saved = {...candidate, revision: id()};
+      localStorage.setItem(KEY, JSON.stringify(saved));
+      store = saved;
       available = true; changed = false; clearError();
       $('persist-status').textContent = '已保存到此浏览器 · ' + time(current()?.updatedAt || now());
       return true;
@@ -40,8 +40,8 @@
   function snapshot(plan, label, force = false) {
     const last = plan.versions[0];
     if (!force && last && equal(last.data, plan.data)) return;
-    plan.versions.unshift({id: id(), at: now(), label, data: clone(plan.data)});
-    plan.versions = plan.versions.slice(0, MAX_VERSIONS);
+    const version = {id: id(), at: now(), label, data: clone(plan.data)};
+    plan.versions = [version, ...plan.versions].slice(0, MAX_VERSIONS);
   }
   function flush() {
     clearTimeout(timer);
@@ -87,11 +87,24 @@
     snapshot(current(), '切换前留存'); store.activeId = planId;
     if (persist()) {apply(current().data); renderPlans(); document.dispatchEvent(new Event('geo:plan-opened'));} else store = before;
   }
-  function makePlan(template, name) {
+  function mergePlanData(data, patch) {
+    const copy = {...data.copy, ...patch.copy};
+    for (const [key, value] of Object.entries(patch.copy)) {
+      const prefix = copyPrefix(key);
+      if (key === 'goals' && !value.trim()) {
+        copy[key] = originalCopy.goals;
+      } else if (prefix && value.trim() && !value.startsWith(prefix) && !value.startsWith(prefix.slice(0, -1) + ':')) {
+        copy[key] = prefix + value;
+      }
+    }
+    return {...data, fields: {...data.fields, ...patch.fields}, copy};
+  }
+  function makePlan(template, name, patch) {
     const data = clone(templates[template]);
     data.fields.client = name || '';
     const d = new Date(); data.fields.date = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    const plan = {id: id(), name: data.fields.client || '未命名客户方案', data, updatedAt: now(), versions: []};
+    const initial = patch ? mergePlanData(data, patch) : data;
+    const plan = {id: id(), name: initial.fields.client.trim() || '未命名客户方案', data: initial, updatedAt: now(), versions: []};
     snapshot(plan, '创建方案'); return plan;
   }
   function manualSave() {
@@ -155,6 +168,121 @@
     current().data=data; current().name=data.fields.client || '未命名方案'; current().updatedAt=now(); snapshot(current(),'恢复历史版本',true);
     if(persist()){apply(data);renderPlans();$('history-dialog').close();say('已恢复历史版本，恢复前的内容也已留存。');} else store=before;
   };
+
+  const importDialog = $('json-import-dialog');
+  const importText = $('json-import-text');
+  const importFile = $('json-import-file');
+  let fileRead = 0;
+  function setImportFeedback(status, message = '') {
+    $('json-import-status').textContent = status;
+    const alert = $('json-import-error');
+    alert.textContent = message;
+    alert.hidden = !message;
+  }
+  function setImportReading(reading) {
+    $('json-import-create').disabled = reading;
+    $('json-import-apply').disabled = reading;
+  }
+  function readImport(showEmptyError = false) {
+    if (!showEmptyError && !importText.value.trim()) {
+      setImportFeedback('');
+      return null;
+    }
+    try {
+      const parsed = globalThis.GEOPlanSchema.parsePlanImport(importText.value);
+      const date = parsed.patch.fields.date;
+      if (date) {
+        const input = $('field-date').cloneNode();
+        input.value = date;
+        if (input.value !== date) throw new Error('方案日期须为有效日期（如 2026-11-25），也可以留空。');
+      }
+      const ignored = parsed.ignoredCount ? `，将跳过 ${parsed.ignoredCount} 个无法识别的字段` : '';
+      setImportFeedback(`已识别 ${parsed.count} 个可填入字段${ignored}。`);
+      return parsed;
+    } catch (failure) {
+      setImportFeedback('', failure.message);
+      return null;
+    }
+  }
+  function importPlan(create) {
+    if (!importDialog.open) return;
+    const parsed = readImport(true);
+    if (!parsed) return;
+
+    const previous = {...current()};
+    if (pending) {
+      previous.data = {...previous.data, ...collect()};
+      previous.name = previous.data.fields.client.trim() || '未命名方案';
+      previous.updatedAt = now();
+    }
+    // Save the new data and the pre-import version in the same storage write.
+    snapshot(previous, create ? '新建前留存' : '导入前留存', !create);
+    const plans = store.plans.map(plan => plan.id === previous.id ? previous : plan);
+    let plan;
+    if (create) {
+      plan = makePlan('generic', '', parsed.patch);
+      plans.push(plan);
+    } else {
+      previous.data = mergePlanData(previous.data, parsed.patch);
+      if (Object.hasOwn(parsed.patch.fields, 'client')) {
+        previous.name = previous.data.fields.client.trim() || '未命名方案';
+      }
+      previous.updatedAt = now();
+      plan = previous;
+    }
+
+    if (!persist({...store, plans, activeId: plan.id})) {
+      setImportFeedback('', '导入未保存。' + $('storage-error').textContent);
+      return;
+    }
+    pending = false;
+    clearTimeout(timer);
+    apply(plan.data);
+    renderPlans();
+    importDialog.close();
+    if (create) document.dispatchEvent(new Event('geo:plan-opened'));
+    const summary = create ? '已新建方案' : '已保存导入前版本';
+    $('persist-status').textContent = `已保存到此浏览器 · 已填入 ${parsed.count} 个字段 · ${summary}`;
+  }
+  $('open-json-import').onclick = () => {
+    $('json-import-target').textContent = pending ? state.client.trim() || '未命名方案' : current().name;
+    importDialog.showModal();
+  };
+  importDialog.addEventListener('close', () => {
+    fileRead++;
+    importText.value = '';
+    importFile.value = '';
+    setImportReading(false);
+    setImportFeedback('');
+  });
+  importText.oninput = () => {
+    fileRead++;
+    setImportReading(false);
+    readImport();
+  };
+  importFile.onchange = async () => {
+    const file = importFile.files[0];
+    if (!file) return;
+    importFile.value = '';
+    importText.value = '';
+    const read = ++fileRead;
+    setImportReading(true);
+    setImportFeedback('正在读取 JSON 文件…');
+    try {
+      const text = await file.text();
+      if (read !== fileRead || !importDialog.open) return;
+      importText.value = text;
+      readImport(true);
+    } catch {
+      if (read !== fileRead || !importDialog.open) return;
+      setImportFeedback('', '无法读取文件，请重新选择文件或直接粘贴 JSON。');
+    } finally {
+      if (read === fileRead) setImportReading(false);
+    }
+  };
+  $('json-import-create').onclick = () => importPlan(true);
+  $('json-import-apply').onclick = () => importPlan(false);
+
   $('save').onclick=manualSave; $('search-plans').oninput=renderPlans; $('backup-plans').onclick=backup;
   $('import-plans').onchange=async event=>{
     const file=event.target.files[0]; if(!file)return;
