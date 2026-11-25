@@ -29,6 +29,7 @@ document.querySelectorAll('#document [data-edit]').forEach(el => {
   originalCopy[el.dataset.edit] = el.textContent.trim();
 });
 let copyState = {...originalCopy};
+const focusCopyKeys = new Set(['p2_focus', 'p5_focus', 'p5_actions']);
 const fieldGroups = {
   business: ['client','business','audience','region'],
   direction: ['concern','evidence','actions'],
@@ -120,6 +121,9 @@ function editorValue(key, value) {
 }
 function syncCopyEditors() {
   document.querySelectorAll('[data-copy]').forEach(input => {input.value = editorValue(input.dataset.copy, copyState[input.dataset.copy] || '');});
+  document.querySelectorAll('[data-reuse-copy]').forEach(input => {
+    input.checked = !Object.hasOwn(copyState, input.dataset.reuseCopy);
+  });
 }
 function applyReport(data) {
   state = {...defaults, ...normalizeCustomerFields(data.fields)};
@@ -147,13 +151,20 @@ function syncPresets() {
 }
 function renderBusinessFocus() {
   document.querySelectorAll('#document [data-focus]').forEach(target=>{
-    target.replaceChildren();const key=target.dataset.focus;
+    target.replaceChildren();
+    const {focus: key, focusCopy} = target.dataset;
+    const overridden = focusCopy && Object.hasOwn(copyState, focusCopy);
+    const value = overridden ? copyState[focusCopy] : state[key];
     const block=target.closest('[data-focus-block]');
-    const present=hasBusinessValue(key);if(block)block.hidden=!present;
+    const present = overridden ? Boolean(value.trim()) : hasBusinessValue(key);
+    if(block)block.hidden=!present;
     if(!present)return;
-    for(const text of String(state[key]).split('\n').map(x=>x.trim()).filter(Boolean)){
+    for(const text of value.split('\n').map(x=>x.trim()).filter(Boolean)){
       const chip=document.createElement('span');chip.className='focus-chip';chip.textContent=text;target.append(chip);
     }
+  });
+  document.querySelectorAll('#document [data-focus-group]').forEach(group => {
+    group.hidden = !group.querySelector('[data-focus-block]:not([hidden])');
   });
   document.querySelectorAll('#document [data-optional-field]').forEach(wrapper=>{wrapper.hidden=!hasBusinessValue(wrapper.dataset.optionalField);});
 }
@@ -209,10 +220,53 @@ function copyEditor(key, label, hint='') {
   input.value=editorValue(key,copyState[key] || '');
   if(key==='goals')input.placeholder='可留空沿用标准服务目标；如需调整，直接填写本次目标';
   input.rows=(key==='goals'||key==='optional'||key==='boundary')?4:3;
-  input.addEventListener('input',()=>{copyState[key]=key==='goals'&&!input.value.trim()?originalCopy.goals:copyPrefix(key)+input.value;const target=document.querySelector(`#document [data-edit="${key}"]`);if(target)target.textContent=copyState[key];dirty();document.dispatchEvent(new Event('geo:report-change'));});
   wrapper.append(title,input);
-  if(hint){const help=document.createElement('span');help.className='field-hint';help.textContent=hint;wrapper.append(help);}
+  if(focusCopyKeys.has(key)) return focusCopyEditor(key, label, wrapper, input);
+  input.addEventListener('input',()=>{copyState[key]=key==='goals'&&!input.value.trim()?originalCopy.goals:copyPrefix(key)+input.value;const target=document.querySelector(`#document [data-edit="${key}"]`);if(target)target.textContent=copyState[key];dirty();document.dispatchEvent(new Event('geo:report-change'));});
+  if(hint) addCopyHint(wrapper, input, hint);
   return wrapper;
+}
+function addCopyHint(wrapper, input, hint) {
+  const help = document.createElement('span');
+  help.className = 'field-hint';
+  help.id = input.id + '-hint';
+  help.textContent = hint;
+  input.setAttribute('aria-describedby', help.id);
+  wrapper.append(help);
+}
+function focusCopyEditor(key, label, wrapper, input) {
+  addCopyHint(wrapper, input, '输入专属文案会取消复用。取消勾选且留空时隐藏卡片。');
+  const group = document.createElement('div');
+  const reuseLabel = document.createElement('label');
+  reuseLabel.className = 'copy-reuse';
+  const reuse = document.createElement('input');
+  reuse.type = 'checkbox';
+  reuse.id = 'reuse-' + key;
+  reuse.dataset.reuseCopy = key;
+  reuse.setAttribute('aria-label', label + '：复用第1页');
+  reuseLabel.append(reuse, '复用第1页');
+  group.append(wrapper, reuseLabel);
+
+  function update() {
+    renderBusinessFocus();
+    dirty();
+    document.dispatchEvent(new Event('geo:report-change'));
+  }
+  input.addEventListener('input', () => {
+    reuse.checked = false;
+    copyState[key] = input.value;
+    update();
+  });
+  reuse.addEventListener('input', () => {
+    if (reuse.checked) {
+      delete copyState[key];
+      input.value = '';
+    } else {
+      copyState[key] = input.value;
+    }
+    update();
+  });
+  return group;
 }
 function copySection(container, title, subtitle, entries, open=false) {
   const detail=document.createElement('details');detail.className='copy-section';detail.dataset.copySection=entries[0][0];detail.open=open;
@@ -225,6 +279,7 @@ function copySection(container, title, subtitle, entries, open=false) {
 function buildCopyEditors() {
   document.getElementById('goals-editor').append(copyEditor('goals','本次服务希望推动的方向（选填调整）','留空时沿用标准服务目标；填写后替换，清空后恢复标准目标。'));
   const schedule=document.getElementById('schedule-editors');
+  copySection(schedule,'第2页摘要卡片','',[['p2_focus','本次优先解决的问题']]);
   const stages=[['第1周','了解业务，记录现状',1],['第2周','知识资料与信源准备',2],['第3周','首批内容制作与核对',3],['第4周','发布、复测与调整',4]];
   for(const [title,sub,n] of stages)copySection(schedule,title,sub,[['w'+n,'我们主要做什么'],['d'+n,'客户能看到什么'],['c'+n,'客户需要配合什么']],n===1);
   copySection(schedule,'排期说明','服务起算与调整条件',[['timing','对客说明']]);
@@ -235,7 +290,10 @@ function buildCopyEditors() {
   copySection(annual,'持续运营与期满总结','兼容原有方案的运营与总结安排',[['w5','持续运营工作'],['d5','持续运营交付'],['w6','期满总结与建议'],['annual_note','年度排期与范围说明']]);
   const content=document.getElementById('content-editors');
   copySection(content,'具体工作','六项工作的实际内容与适用范围',[['a1','企业知识整理'],['a2','关键词与平台定位'],['a3','内容制作与核对'],['a4','公开信息与信源建设'],['a5','内容发布与留档'],['a6','复测与信息更新'],['optional','可选专项与范围说明']]);
-  copySection(content,'进展反馈与监测','查看方式与观察口径',[['access','客户怎样查看进展'],['metric1','问题范围与可比性'],['metric2','监测记录与比例口径'],['metric3','监测结果的适用限制']]);
+  copySection(content,'进展反馈与监测','页首摘要、查看方式与观察口径',[
+    ['access','客户怎样查看进展'],['metric1','问题范围与可比性'],['metric2','监测记录与比例口径'],['metric3','监测结果的适用限制'],
+    ['p5_focus','本次关注的问题'],['p5_actions','拟跟进的客户行动']
+  ]);
   copySection(content,'合作与总结','服务边界与下一步',[['boundary','服务范围与效果说明'],['end','期满交付与后续建议'],['next','下一步安排']]);
 }
 function updatePrintStatus(output) {

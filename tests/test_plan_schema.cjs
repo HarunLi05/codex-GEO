@@ -54,6 +54,17 @@ test('plan import accepts a complete assistant export and partial patches with e
   });
 });
 
+test('plan import accepts optional report copy and preserves omissions and explicit blanks',()=>{
+  const copy={p2_focus:'首月测试重点',p5_focus:'反馈测试重点',p5_actions:''};
+  assert.deepEqual(schema.parsePlanImport(JSON.stringify({copy})),{
+    patch:{fields:{},copy},count:3,ignoredCount:0
+  });
+  assert.deepEqual(schema.parsePlanImport('{"copy":{"p5_actions":""}}'),{
+    patch:{fields:{},copy:{p5_actions:''}},count:1,ignoredCount:0
+  });
+  assert.throws(()=>schema.parsePlanImport('{"copy":{"p5_actions":null}}'),/copy\.p5_actions.*必须是字符串/);
+});
+
 test('plan import discards unknown keys and preserves only the recognized paths',()=>{
   const source='{"activeId":"irrelevant","fields":{"__proto__":{"polluted":"test"},"constructor":"test","client":"测试品牌"},"copy":{"unknown":"ignored"},"history":[]}';
   assert.deepEqual(schema.parsePlanImport(source),{

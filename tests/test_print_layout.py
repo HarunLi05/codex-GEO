@@ -123,6 +123,8 @@ def main():
             assert page.evaluate('JSON.stringify(collect())') == before_state
             page.emulate_media(media='print')
             assert not page.locator('#document').is_visible()
+            print_fonts = page.locator('#prepared-print .page').first.evaluate('(page) => getComputedStyle(page).fontFamily')
+            assert print_fonts.split(',')[0].strip(' "') == 'PingFang SC', print_fonts
             layout = check_layout(page, '#prepared-print', 6)
             output = root / (name + '.pdf')
             page.pdf(path=output, prefer_css_page_size=True, print_background=True)
@@ -155,6 +157,8 @@ def main():
                 customer.evaluate('window.dispatchEvent(new Event("beforeprint"))')
                 assert customer.locator('#report-source').inner_html() == source
                 customer.emulate_media(media='print')
+                standalone_fonts = customer.locator('.report-print .page').first.evaluate('(page) => getComputedStyle(page).fontFamily')
+                assert standalone_fonts == print_fonts, (standalone_fonts, print_fonts)
                 exported_layout = check_layout(customer, '.report-print', 6)
                 output = root / 'standalone.pdf'
                 customer.pdf(path=output, prefer_css_page_size=True, print_background=True)

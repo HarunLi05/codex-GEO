@@ -18,7 +18,12 @@
       ...[['boundary','服务范围与效果说明'],['end','期满交付与后续建议'],['next','下一步安排']].map(([key,label])=>field('copy.'+key,label,'服务安排 → 工作说明 → 合作与总结'))]}
   ];
   const allFields=sections.flatMap(s=>s.fields);
-  const fieldsByPath=new Map(allFields.map(field=>[field.path,field]));
+  const importLabels=new Map([
+    ...allFields.map(({path,label})=>[path,label]),
+    ['copy.p2_focus','第2页 · 本次优先解决的问题'],
+    ['copy.p5_focus','第5页 · 本次关注的问题'],
+    ['copy.p5_actions','第5页 · 拟跟进的客户行动']
+  ]);
   const lockedPaths=['fields.provider','fields.date','fields.duration','fields.platforms','fields.scope','fields.fee'];
   const placeholder=/【[^】]+】|\$\{[^}]+\}|\{\{[^}]+\}\}|\[(?:客户|企业|品牌|产品|品类|地区|区域|名称|请填|待填)[^\]]*\]|[（(](?:客户名称|企业名称|品牌名称|产品名称|请填写|待填写|请替换)[^）)]*[）)]|(?:请替换|产品名称待填)/u;
   const isObject=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
@@ -45,12 +50,12 @@
       if(!isObject(entries))throw new Error('JSON 中的 '+part+' 必须是对象。');
       for(const [key,value] of Object.entries(entries)) {
         const path=part+'.'+key;
-        const field=fieldsByPath.get(path);
-        if(!field) {
+        const label=importLabels.get(path);
+        if(!label) {
           ignoredCount++;
           continue;
         }
-        if(typeof value!=='string')throw new Error('“'+field.label+'”（'+path+'）必须是字符串。请在 JSON 中用双引号包住字段值。');
+        if(typeof value!=='string')throw new Error('“'+label+'”（'+path+'）必须是字符串。请在 JSON 中用双引号包住字段值。');
         patch[part][key]=value;
         count++;
       }

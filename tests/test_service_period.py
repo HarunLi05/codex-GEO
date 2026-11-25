@@ -13,7 +13,10 @@ def main():
         context=browser.new_context(accept_downloads=True)
         page=context.new_page();page.goto(url)
         paths=page.evaluate('''() => [...document.querySelectorAll('#fields [name]')].map(el=>'fields.'+el.name).concat([...document.querySelectorAll('[data-copy]')].map(el=>'copy.'+el.dataset.copy)).sort()''')
-        assert paths==page.evaluate('GEOPlanSchema.allFields.map(f=>f.path).sort()'), 'Assistant and editor fields drifted'
+        assistant_paths=page.evaluate('GEOPlanSchema.allFields.map(f=>f.path)')
+        editor_only_paths=['copy.p2_focus', 'copy.p5_focus', 'copy.p5_actions']
+        assert len(assistant_paths)==65 and not set(assistant_paths).intersection(editor_only_paths)
+        assert paths==sorted(assistant_paths+editor_only_paths), 'Assistant and editor fields drifted'
         page.locator('[name=business]').fill('虚构周期测试设备服务')
         page.locator('#step-service').click()
         original=page.evaluate('JSON.stringify(collect().copy)')
@@ -50,6 +53,6 @@ def main():
         page.locator('[name=duration]').fill('12个月＋赠送1个月')
         assert '13个月' in page.locator('#document [data-period-lead]').text_content()
         browser.close()
-    print('PASS: all 65 field names aligned; 13-month editor/workspace/client PDFs; 3-month rows hidden; unknown cycle explicit; saved body unchanged')
+    print('PASS: 65 assistant fields and 3 editor-only fields; 13-month editor/workspace/client PDFs; 3-month rows hidden; unknown cycle explicit; saved body unchanged')
 
 if __name__=='__main__':main()
